@@ -3,17 +3,17 @@ import jwt from "jsonwebtoken";
 import Sequelize from "sequelize";
 const Op = Sequelize.Op;
 
-export const refreshToken = async(req, res) => {
+export const RefreshToken = async(req, res) => {
     try {
-        const refreshToken = req.cookies.refreshToken;
-        if(!refreshToken) return res.sendStatus(433).send({message:"Invalid token"});
+        const RefreshToken = req.cookies.RefreshToken;
+        if(!RefreshToken) return res.sendStatus(433).send({message:"Invalid token"});
         const User = await Users.findOne({
             where:{
-                RefreshToken:{[Op.eq]:refreshToken}
+                RefreshToken:{[Op.eq]:RefreshToken}
             }
         });
         if(!User) return res.sendStatus(433).send({message:"Token doesn't exist"});
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        jwt.verify(RefreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
             if(err) return res.sendStatus(400).send({message:"Verify token failed"});
             const UserId = User.Id;
             const Phone = User.Phone;

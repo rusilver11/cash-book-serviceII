@@ -23,6 +23,12 @@ const Users = db.define("Users",{
       OTP:{
         type:DataTypes.INTEGER
       },
+      StatusVerified:{
+        type:DataTypes.INTEGER
+      },
+      OTPExpired:{
+        type:DataTypes.DATE
+      },
       CreatedAt:{
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
