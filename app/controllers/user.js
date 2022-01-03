@@ -14,9 +14,10 @@ export const getUsers = async (req, res) => {
     const users = await Users.findAll({
       attributes: ["Id", "Name", "Phone", "CreatedAt", "UpdatedAt"],
     });
-    res.json(users);
+    return res.status(200).json(users);
   } catch (error) {
     console.log(error);
+    return res.status(400)
   }
 };
 
@@ -84,7 +85,7 @@ export const Login = async (req, res, next) => {
           UpdatedAt: Date.now(),
         },
         {
-          fields: ["UserId", "CreatedBy", "CreatedAt", "UpdatedAt"],
+          fields: ["UserId", "CreatedAt", "UpdatedAt"],
         },
         { transaction: t }
       );
@@ -121,7 +122,7 @@ export const Login = async (req, res, next) => {
       res.status(400).send({
         status: false,
         message: "Register Failed",
-        response: error,
+        response: error.message,
       })
     );
   }
@@ -189,57 +190,9 @@ export const VerifyOTP = async (req, res) => {
     return await t.commit(), res.status(200).json({ accessToken });
   } catch (error) {
     console.error(error);
-    return await t.rollback(), res.status(400).send({ response: error });
+    return await t.rollback(), res.status(400).send({ response: error.message });
   }
 };
-
-// export const Login = async (req, res) => {
-//   const { phone } = req.body;
-//   const t = await database.transaction();
-//   try {
-//     const User = await Users.findOne({
-//       where: {
-//         Phone: { [Op.eq]: phone },
-//         StatusVerified: { [Op.eq]: 1 },
-//       },
-//     },{transaction:t});
-//     if (!User) return t.rollback(),res.status(433).send({ message: "User doesn't exists or not verified" });
-
-//     const UserId = User.Id;
-//     const Phone = User.Phone;
-//     const accessToken = jwt.sign(
-//       { UserId, Phone },
-//       process.env.ACCESS_TOKEN_SECRET,
-//       {
-//         expiresIn: "60s",
-//       }
-//     );
-//     const refreshToken = jwt.sign(
-//       { UserId, Phone },
-//       process.env.REFRESH_TOKEN_SECRET,
-//       {
-//         expiresIn: "1d",
-//       }
-//     );
-//     await Users.update(
-//       { RefreshToken: refreshToken },
-//       {
-//         where: {
-//           Id: { [Op.eq]: UserId },
-//         },
-//       },{transaction:t});
-//     res.cookie("refreshToken", refreshToken, {
-//       httpOnly: true,
-//       maxAge: 86400000, //24h
-//     });
-//     await t.commit();
-//     return res.status(200).json({ accessToken });
-//   } catch (error) {
-//     console.log(error);
-//     await t.commit();
-//     return res.status(400).send({ message: "Login Failed" });
-//   }
-// };
 
 export const Logout = async (req, res) => {
   try {

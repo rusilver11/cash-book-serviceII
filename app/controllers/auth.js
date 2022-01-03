@@ -13,11 +13,11 @@ export const RefreshToken = async(req, res) => {
             }
         });
         if(!User) return res.sendStatus(433).send({message:"Token doesn't exist"});
-        jwt.verify(RefreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+        jwt.verify(RefreshToken, `${process.env.REFRESH_TOKEN_SECRET}`, (err, decoded) => {
             if(err) return res.sendStatus(400).send({message:"Verify token failed"});
             const UserId = User.Id;
             const Phone = User.Phone;
-            const accessToken = jwt.sign({UserId,Phone}, process.env.ACCESS_TOKEN_SECRET,{
+            const accessToken = jwt.sign({UserId,Phone}, `${process.env.ACCESS_TOKEN_SECRET}`,{
                 expiresIn: '15s'
             });
             res.json({ accessToken });

@@ -21,9 +21,6 @@ const Businesses = db.define("Businesses",{
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    CreatedBy:{
-      type: DataTypes.STRING
-    },
     CreatedAt:{
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
@@ -32,8 +29,7 @@ const Businesses = db.define("Businesses",{
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     } 
-},{freezeTableName:true
-});
+},{freezeTableName:true});
 
 Businesses.associate = function(models){
       Businesses.hasMany(models.Products,{

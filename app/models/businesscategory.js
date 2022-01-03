@@ -1,28 +1,31 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class BusinessCategory extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      BusinessCategory.hasMany(models.Business,{
-        foreignKey: 'BusinessId',
-        as: 'BusinessCategoryBusiness'
-      });
-    }
-  };
-  BusinessCategory.init({
-    Id: DataTypes.INTEGER,
-    Name: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'BusinessCategory',
+import {Sequelize} from "sequelize";
+import db from "../config/connectionDatabase.js";
+
+const {DataTypes} = Sequelize;
+const BusinessCategory = db.define("BusinessCategory",{
+  Id:{
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement:true
+  },
+  Name:{
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  CreatedAt:{
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  UpdatedAt:{
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  } 
+},{freezeTableName:true});
+
+BusinessCategory.associate = function(models){
+  BusinessCategory.hasMany(models.Businesses,{
+    foreignKey: 'BusinessCategoryId',
+    as: 'BusinessCategoryBusiness'
   });
-  return BusinessCategory;
 };
+export default BusinessCategory;

@@ -62,7 +62,7 @@ export const ResendOTP = async (req, res) => {
     );
     await t.commit();
     res.status(200).send({ message: "Success to resend OTP" });
-    return SendWAMessage(phone, findUser.OTP);
+    return SendWAMessage(phone, otpnumber);
   } catch (error) {
     await t.rollback();
     return res.status(400).send({
