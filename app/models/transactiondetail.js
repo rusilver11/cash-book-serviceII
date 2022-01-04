@@ -1,31 +1,34 @@
-'use strict';
-const {Model} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class TransactionDetail extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      TransactionDetail.belongsTo(models.TransactionDetail,{
-        foreignKey: 'TransactionId',
-        as: 'TransaactionDetailTransaction'
-      });
-      TransactionDetail.belongsTo(models.Product,{
-        foreignKey: 'ProductId',
-        as: 'TransactionDetailProduct'
-      });  
-    }
-  };
-  TransactionDetail.init({
-    TransactionId: DataTypes.UUID,
-    ProductId: DataTypes.UUID,
-    Qty: DataTypes.DECIMAL
-  }, {
-    sequelize,
-    modelName: 'TransactionDetail',
+import {Sequelize} from "sequelize" ;
+import db from "../config/connectionDatabase.js";
+
+const {DataTypes} = Sequelize;
+const TransactionDetail = db.define("TransactionDetail",{
+  TransactionId:{
+   type: DataTypes.UUID,
+  },
+  ProductId:{ 
+   type: DataTypes.UUID
+  },
+  Qty:{
+   type: DataTypes.DECIMAL
+  },
+  CreatedAt:{ 
+   type: DataTypes.DATE
+  },
+  UpdatedAt:{ 
+   type: DataTypes.DATE
+  },
+},{freezeTableName:true});
+
+TransactionDetail.associate = function(models) {
+  // define association here
+  TransactionDetail.belongsTo(models.Transactions,{
+    foreignKey: 'TransactionId',
+    as: 'TransactionDetailTransaction'
   });
-  return TransactionDetail;
+  TransactionDetail.belongsTo(models.Products,{
+    foreignKey: 'ProductId',
+    as: 'TransactionDetailProduct'
+  });  
 };
+export default TransactionDetail;

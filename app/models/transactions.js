@@ -1,44 +1,64 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Transactions extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      Transactions.hasMany(models.TransactionDetail,{
-        foreignKey: 'TransactiId',
-        as: 'TransaactionPerson'
-      });
-      Transactions.belongsTo(models.Person,{
-        foreignKey: 'PersonId',
-        as: 'TransaactionPerson'
-      });
-      Transactions.belongsTo(models.Business,{
-        foreignKey: 'BusinessId',
-        as: 'TransaactionBusiness'
-      });    
-    }
-  };
-  Transactions.init({
-    Id: DataTypes.UUID,
-    TransactionAt: DataTypes.DATE,
-    Status: DataTypes.STRING,
-    Description: DataTypes.STRING,
-    Amount: DataTypes.DECIMAL,
-    TransactionType: DataTypes.STRING,
-    PaymentType: DataTypes.STRING,
-    PersonId: DataTypes.UUID,
-    BusinessId: DataTypes.UUID,
-    CreatedBy: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Transactions',
+import {Sequelize} from "sequelize" ;
+import db from "../config/connectionDatabase.js";
+
+const {DataTypes} = Sequelize;
+const Transactions = db.define("Transactions",{
+  Id: {
+    type: DataTypes.UUID,
+    primaryKey:true,
+    defaultValue: DataTypes.UUID4
+  },
+  TransactionAt:{ 
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  Status:{ 
+    type:DataTypes.STRING
+  },
+  Description:{ 
+    type:DataTypes.STRING
+  },
+  Amount:{ 
+    type:DataTypes.DECIMAL
+  },
+  TransactionType:{ 
+    type:DataTypes.STRING
+  },
+  PaymentType:{ 
+    type:DataTypes.STRING
+  },
+  PersonId:{ 
+    type:DataTypes.UUID
+  },
+  BusinessId:{ 
+    type:DataTypes.UUID
+  },
+  CreatedBy:{ 
+    type:DataTypes.STRING
+  },
+  CreatedAt:{ 
+    type:DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  UpdatedAt:{ 
+    type:DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
+},{freezeTableName:true});
+
+Transactions.associate = function(models) {
+  // define association here
+  Transactions.hasMany(models.TransactionDetail,{
+    foreignKey: 'TransactiId',
+    as: 'TransactionDetailId'
   });
-  return Transactions;
+  Transactions.belongsTo(models.Persons,{
+    foreignKey: 'PersonId',
+    as: 'TransactionPerson'
+  });
+  Transactions.belongsTo(models.Businesses,{
+    foreignKey: 'BusinessId',
+    as: 'TransactionBusiness'
+  });   
 };
+export default Transactions;
