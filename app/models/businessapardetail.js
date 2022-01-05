@@ -1,32 +1,42 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class BusinessApArDetail extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      BusinessApArDetail.belongsTo(models.BusinessApAr,{
-        foreignKey: 'BusinessApArId',
-        as: 'BusinessApArDetailBusinessApAr'
-      });
-    }
-  };
-  BusinessApArDetail.init({
-    BusinessApArId: DataTypes.UUID,
-    BusinessApArDetailAt: DataTypes.DATE,
-    Amount: DataTypes.DECIMAL,
-    Description: DataTypes.STRING,
-    ApArType: DataTypes.STRING,
-    CreatedBy: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'BusinessApArDetail',
+import {Sequelize} from "sequelize" ;
+import db from "../config/connectionDatabase.js";
+
+const {DataTypes} = Sequelize;
+const BusinessApArDetail = db.define("BusinessApArDetail",{
+  BusinessApArId:{ 
+    type:DataTypes.UUID
+  },
+  BusinessApArDetailAt:{ 
+    type:DataTypes.DATE
+  },
+  Amount:{ 
+    type:DataTypes.DECIMAL,
+    defaultValue:0
+  },
+  Description:{ 
+    type:DataTypes.STRING
+  },
+  ApArType:{ 
+    type:DataTypes.STRING
+  },
+  CreatedBy:{ 
+    type:DataTypes.STRING
+  },
+  CreatedAt:{ 
+    type:DataTypes.DATE,
+    defaultValue:DataTypes.NOW
+  },
+  UpdatedAt:{ 
+    type:DataTypes.DATE,
+    defaultValue:DataTypes.NOW
+  }
+},{freezeTableName:true});
+
+BusinessApArDetail.associate = function(models) {
+  // define association here
+  BusinessApArDetail.belongsTo(models.BusinessApAr,{
+    foreignKey: 'BusinessApArId',
+    as: 'BusinessApArDetailBusinessApAr'
   });
-  return BusinessApArDetail;
-};
+}
+export default BusinessApArDetail;

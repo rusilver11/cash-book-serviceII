@@ -22,7 +22,7 @@ const BusinessCategory = db.define("BusinessCategory",{
   } 
 },{freezeTableName:true});
 
-BusinessCategory.associate = function(models){
+BusinessCategory.associate = (models) => {
   BusinessCategory.hasMany(models.Businesses,{
     foreignKey: 'BusinessCategoryId',
     as: 'BusinessCategoryBusiness'

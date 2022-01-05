@@ -1,28 +1,44 @@
-'use strict';
-const {Model} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Person extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      Person.belongsTo(models.User,{
-        foreignKey: 'UserId',
-        as: 'PersonUser'
-      })
-    }
-  };
-  Person.init({
-    Id: DataTypes.UUID,
-    UserId: DataTypes.UUID,
-    Name: DataTypes.STRING,
-    Phone: DataTypes.STRING,
-    CreatedBy: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Person',
+import { Sequelize } from "sequelize";
+import db from "../config/connectionDatabase.js";
+
+const { DataTypes } = Sequelize;
+const Persons = db.define(
+  "Persons",
+  {
+    Id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUID4,
+    },
+    UserId: {
+      type: DataTypes.UUID,
+    },
+    Name: {
+      type: DataTypes.STRING,
+    },
+    Phone: {
+      type: DataTypes.STRING,
+    },
+    CreatedBy: {
+      type: DataTypes.STRING,
+    },
+    CreatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    UpdatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  { freezeTableName: true }
+);
+
+Persons.associate = function (models) {
+  Persons.belongsTo(models.Users, {
+    foreignKey: "UserId",
+    as: "PersonUser",
   });
-  return Person;
 };
+
+export default Persons;

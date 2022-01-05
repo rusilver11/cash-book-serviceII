@@ -1,30 +1,41 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class ProductCategory extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-      ProductCategory.belongsTo(models.Product,{
-        foreignKey: 'BusinessId',
-        as: 'ProductCategoryBusiness'
-      });
-    }
-  };
-  ProductCategory.init({
-    Id: DataTypes.INTEGER,
-    Name: DataTypes.STRING,
-    BusinessId: DataTypes.UUID,
-    CreatedBy: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'ProductCategory',
+import { Sequelize } from "sequelize";
+import db from "../config/connectionDatabase.js";
+
+const { DataTypes } = Sequelize;
+const ProductCategory = db.define(
+  "ProductCategory",
+  {
+    Id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    Name: {
+      type: DataTypes.STRING,
+    },
+    BusinessId: {
+      type: DataTypes.UUID,
+    },
+    CreatedBy: {
+      type: DataTypes.STRING,
+    },
+    CreatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    UpdatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  { freezeTableName: true }
+);
+
+ProductCategory.associate = function (models) {
+  // define association here
+  ProductCategory.belongsTo(models.Businesses, {
+    foreignKey: "BusinessId",
+    as: "ProductCategoryBusiness",
   });
-  return ProductCategory;
 };
+export default ProductCategory;

@@ -4,7 +4,7 @@ import {RefreshToken} from "../controllers/auth.js"
 import {getUsers,Login,VerifyOTP,Logout} from "../controllers/user.js";
 import {SendOTP,ResendOTP} from "../middlewares/waotp.js"
 import { Businesscategory } from "../controllers/businesscategory.js";
-import { GetBusinesses,AddBusinesses,EditBusinesses,DeleteBusinesses } from "../controllers/businesses.js";
+import { GetBusinesses,GetAllBusinesses,AddBusinesses,EditBusinesses,DeleteBusinesses } from "../controllers/businesses.js";
 
 
 const router = express.Router();
@@ -22,7 +22,8 @@ router.get("/api/token", RefreshToken);
 router.delete("/api/logout", Logout);
 //sect businesses
 router.get("/api/business-category",Businesscategory);
-router.get("/api/businesses/:id", GetBusinesses);
+router.get("/api/businesses/detail/:id", GetBusinesses);
+router.get("/api/businesses/:id", GetAllBusinesses);
 router.post("/api/businesses", AddBusinesses);
 router.patch("/api/businesses/:id", EditBusinesses);
 router.delete("/api/businesses/:id", DeleteBusinesses);

@@ -19,7 +19,8 @@ const Transactions = db.define("Transactions",{
     type:DataTypes.STRING
   },
   Amount:{ 
-    type:DataTypes.DECIMAL
+    type:DataTypes.DECIMAL,
+    defaultValue:0
   },
   TransactionType:{ 
     type:DataTypes.STRING

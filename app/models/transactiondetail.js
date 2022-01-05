@@ -10,7 +10,8 @@ const TransactionDetail = db.define("TransactionDetail",{
    type: DataTypes.UUID
   },
   Qty:{
-   type: DataTypes.DECIMAL
+   type: DataTypes.DECIMAL,
+   defaultValue: 0
   },
   CreatedAt:{ 
    type: DataTypes.DATE
