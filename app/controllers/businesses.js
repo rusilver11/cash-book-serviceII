@@ -1,9 +1,4 @@
 import Businesses from "../models/businesses.js";
-import BusinessesCategory from "../models/businesscategory.js";
-import Transactions from "../models/transactions.js";
-import BusinessApAr from "../models/businessapar.js";
-import Products from "../models/products.js";
-import ProductCategory from "../models/productcategory.js";
 import Sequelize from "sequelize";
 import database from "../config/connectionDatabase.js";
 
@@ -13,10 +8,11 @@ export const GetAllBusinesses = async (req, res) => {
   try {
     const userid = req.params.id;
     const findBusinesses = await Businesses.findAll({
+      attributes: ["Id", "Name"],
       where: {
         UserId: { [Op.eq]: userid },
       },
-      attributes: ["Id", "Name"],
+      order:[["CreatedAt","ASC"]]
     });
 
     return res.status(200).json(findBusinesses);
@@ -28,17 +24,18 @@ export const GetAllBusinesses = async (req, res) => {
 
 export const GetBusinesses = async (req, res) => {
   try {
-    const userid = req.params.id;
+    const businessid = req.params.id;
     const findBusinesses = await Businesses.findAll({
-      include:{
-        model:BusinessesCategory,
-        as: "BC"
+      attributes:["Id","UserId","Name"],
+      include: { 
+        association:"BusinessCategory",
+        attributes: ["Id","Name"]
       },
       where: {
-        UserId: { [Op.eq]: userid },
+        Id: { [Op.eq]: businessid },
       },
+      order:[["CreatedAt","ASC"]]
     });
-
     return res.status(200).json(findBusinesses);
   } catch (error) {
     console.log(error);

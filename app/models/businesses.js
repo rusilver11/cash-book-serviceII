@@ -1,8 +1,10 @@
 import {Sequelize} from "sequelize" ;
 import db from "../config/connectionDatabase.js";
+import BusinessCategory from "./businesscategory.js";
+import Users from "./users.js";
 
 const {DataTypes} = Sequelize;
-const Businesses = db.define("Businesses",{
+ export const Businesses = db.define("Businesses",{
     Id:{
       type: DataTypes.UUID,
       primaryKey: true,
@@ -31,30 +33,32 @@ const Businesses = db.define("Businesses",{
     } 
 },{freezeTableName:true});
 
-Businesses.associate = function(models){
-      Businesses.hasMany(models.Products,{
-        foreignKey: 'BusinessId',
-        as: 'BusinessProducts'
-      });
-      Businesses.hasMany(models.ProductCategory,{
-        foreignKey: 'BusinessId',
-        as: 'BusinessProductCategory'
-      });
-      Businesses.hasMany(models.Transactions,{
-        foreignKey: 'BusinessId',
-        as: 'BusinessTransaction'
-      });
-      Businesses.hasMany(models.BusinessApAr,{
-        foreignKey: 'BusinessId',
-        as: 'BusinessBusinessApAr'
-      });
-      Businesses.belongsTo(models.User,{
-        foreignKey: 'UserId',
-        as: 'BusinessUser'
-      });
-      Businesses.belongsTo(models.BusinessCategory,{
-        foreignKey: 'BusinessCategoryId',
-        as: 'BusinessCategory'
-      });
-};
+Businesses.belongsTo(BusinessCategory,{
+  foreignKey: 'BusinessCategoryId',
+  as: 'BusinessCategory'
+});
+Businesses.belongsTo(Users,{
+  foreignKey: 'UserId',
+  as: 'BusinessUser'
+});
+// Businesses.hasMany(models.Products,{
+//   foreignKey: 'BusinessId',
+//   as: 'BusinessProducts'
+// });
+// Businesses.hasMany(models.ProductCategory,{
+//   foreignKey: 'BusinessId',
+//   as: 'BusinessProductCategory'
+// });
+// Businesses.hasMany(models.Transactions,{
+//   foreignKey: 'BusinessId',
+//   as: 'BusinessTransaction'
+// });
+// Businesses.hasMany(models.BusinessApAr,{
+//   foreignKey: 'BusinessId',
+//   as: 'BusinessBusinessApAr'
+// });
+
 export default Businesses;
+
+
+

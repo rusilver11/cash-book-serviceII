@@ -19,13 +19,20 @@ const BusinessCategory = db.define("BusinessCategory",{
   UpdatedAt:{
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
-  } 
+  }
 },{freezeTableName:true});
 
-BusinessCategory.associate = (models) => {
-  BusinessCategory.hasMany(models.Businesses,{
-    foreignKey: 'BusinessCategoryId',
-    as: 'BusinessCategoryBusiness'
-  });
-};
+// BusinessCategory.hasMany(Businesses,{
+//   as: 'BusinessCategoryBusiness',
+//   foreignKey: 'BusinessCategoryId'
+// });
+
+// BusinessCategory.associate = (models) => {
+//   BusinessCategory.hasMany(models.Businesses,{
+//     as: 'BusinessCategoryBusiness',
+//     foreignKey: 'BusinessCategoryId'
+//   });
+// };
+
 export default BusinessCategory;
+
