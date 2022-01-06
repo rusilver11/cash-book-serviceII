@@ -60,46 +60,45 @@ export const AddBusinesses = async (req, res) => {
       },
       { transaction: t }
     );
-    return await t.commit(), res.status(200).json(createBusinesses);
+    return await t.commit(), res.status(200).json({result:createBusinesses});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
 };
 
 export const EditBusinesses = async (req, res) => {
-  const id = req.params.id;
+  const businessid = req.params.id;
   const { category, name } = req.body;
   const t = await database.transaction();
   try {
-    const createBusinesses = await Businesses.update(
+    await Businesses.update(
       {
         BusinessCategoryId: category,
         Name: name,
-        CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },
       {
         where: {
-          Id: id,
+          Id: businessid,
         },
       },
       { transaction: t }
     );
-    return await t.commit(), res.status(200).json(createBusinesses);
+    return await t.commit(), res.status(200).json({message:`Business ${name} updated`});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
 };
 
 export const DeleteBusinesses = async (req, res) => {
-  const id = req.params.id;
+  const businessid = req.params.id;
   const t = await database.transaction();
   try {
    await database
       .query(
         `DELETE FROM "BusinessApArDetail" WHERE "BusinessApArId" IN  (SELECT "Id" FROM "BusinessApAr" WHERE "BusinessId" = :businessid)`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -108,7 +107,7 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "BusinessApAr" WHERE "BusinessId" = :businessid`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -117,7 +116,7 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "TransactionDetail" WHERE "TransactionId" IN  (SELECT "Id" FROM "Transactions" WHERE "BusinessId" = :businessid)`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -126,7 +125,7 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "Transactions" WHERE "BusinessId" = :businessid`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -135,7 +134,7 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "Products" WHERE "BusinessId" = :businessid`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -144,7 +143,7 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "ProductCategory" WHERE "BusinessId" = :businessid`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
@@ -153,13 +152,13 @@ export const DeleteBusinesses = async (req, res) => {
       .query(
         `DELETE FROM "Businesses" WHERE "Id" = :businessid`,
         {
-          replacements: { businessid: id },
+          replacements: { businessid: businessid },
           type: Sequelize.QueryTypes.DELETE,
           transaction: t,
         }
       );
       
-    return await t.commit(), res.status(200).send("Delete Business successed");
+    return await t.commit(), res.status(200).json({message:"Business deleted"});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }

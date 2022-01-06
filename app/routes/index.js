@@ -5,6 +5,7 @@ import {getUsers,Login,VerifyOTP,Logout} from "../controllers/user.js";
 import {SendOTP,ResendOTP} from "../middlewares/waotp.js"
 import { Businesscategory } from "../controllers/businesscategory.js";
 import { GetBusinesses,GetAllBusinesses,AddBusinesses,EditBusinesses,DeleteBusinesses } from "../controllers/businesses.js";
+import { GetAllProductcategory,AddProductCategory,EditProductCategory,DeleteProductCategory } from "../controllers/productcategory.js";
 
 
 const router = express.Router();
@@ -27,5 +28,13 @@ router.get("/api/businesses/:id", GetAllBusinesses);
 router.post("/api/businesses", AddBusinesses);
 router.patch("/api/businesses/:id", EditBusinesses);
 router.delete("/api/businesses/:id", DeleteBusinesses);
+//sect product category
+router.get("/api/product-category/:id",GetAllProductcategory);
+router.post("/api/product-category",AddProductCategory);
+router.patch("/api/product-category/:id",EditProductCategory)
+router.delete("/api/product-category/:id",DeleteProductCategory)
+//sect product
+
+
 
 export default router

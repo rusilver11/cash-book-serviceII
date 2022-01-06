@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../config/connectionDatabase.js";
+import Businesses from "./businesses.js";
 
 const { DataTypes } = Sequelize;
 const ProductCategory = db.define(
@@ -31,11 +32,16 @@ const ProductCategory = db.define(
   { freezeTableName: true }
 );
 
-ProductCategory.associate = function (models) {
-  // define association here
-  ProductCategory.belongsTo(models.Businesses, {
-    foreignKey: "BusinessId",
-    as: "ProductCategoryBusiness",
-  });
-};
+ProductCategory.belongsTo(Businesses, {
+  foreignKey: "BusinessId",
+  as: "ProductCategoryBusiness",
+});
+
+// ProductCategory.associate = function (models) {
+//   // define association here
+//   ProductCategory.belongsTo(models.Businesses, {
+//     foreignKey: "BusinessId",
+//     as: "ProductCategoryBusiness",
+//   });
+// };
 export default ProductCategory;
