@@ -31,8 +31,8 @@ router.delete("/api/businesses/:id", DeleteBusinesses);
 //sect product category
 router.get("/api/product-category/:id",GetAllProductcategory);
 router.post("/api/product-category",AddProductCategory);
-router.patch("/api/product-category/:id",EditProductCategory)
-router.delete("/api/product-category/:id",DeleteProductCategory)
+router.patch("/api/product-category/:businessid/:id",EditProductCategory)
+router.delete("/api/product-category/:businessid/:id",DeleteProductCategory)
 //sect product
 
 
