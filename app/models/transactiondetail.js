@@ -1,5 +1,7 @@
 import {Sequelize} from "sequelize" ;
 import db from "../config/connectionDatabase.js";
+import Transactions from "./transactions.js";
+import Products from "./products.js";
 
 const {DataTypes} = Sequelize;
 const TransactionDetail = db.define("TransactionDetail",{
@@ -21,15 +23,13 @@ const TransactionDetail = db.define("TransactionDetail",{
   },
 },{freezeTableName:true});
 
-TransactionDetail.associate = function(models) {
-  // define association here
-  TransactionDetail.belongsTo(models.Transactions,{
-    foreignKey: 'TransactionId',
-    as: 'TransactionDetailTransaction'
-  });
-  TransactionDetail.belongsTo(models.Products,{
-    foreignKey: 'ProductId',
-    as: 'TransactionDetailProduct'
-  });  
-};
+TransactionDetail.belongsTo(models.Transactions,{
+  foreignKey: 'TransactionId',
+  as: 'TransactionDetailTransaction'
+});
+TransactionDetail.belongsTo(models.Products,{
+  foreignKey: 'ProductId',
+  as: 'TransactionDetailProduct'
+});  
+
 export default TransactionDetail;

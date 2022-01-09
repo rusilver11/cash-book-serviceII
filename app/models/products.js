@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/connectionDatabase.js";
+import ProductCategory from "./productcategory.js";
+import Businesses from "./businesses.js";
 
 const { DataTypes } = Sequelize;
 const Products = db.define(
@@ -14,13 +16,20 @@ const Products = db.define(
       type: DataTypes.STRING,
     },
     TransactionType: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER, //0 = pemasukan, 1 = pengeluaran, 2 = semua
+      defaultValue: 0,
+      allowNull:false
     },
     ProductCategoryId: {
       type: DataTypes.INTEGER,
     },
+    EstimatePrice: {
+      type: DataTypes.INTEGER,
+      defaultValue:0,
+    },
     BusinessId: {
       type: DataTypes.UUID,
+      allowNull:false
     },
     CreatedBy: {
       type: DataTypes.STRING,
@@ -37,19 +46,20 @@ const Products = db.define(
   { freezeTableName: true }
 );
 
+Products.belongsTo(Businesses, {
+  foreignKey: "BusinessId",
+  as: "ProductBusiness",
+});
+Products.belongsTo(ProductCategory, {
+  foreignKey: "ProductCategoryId",
+  as: "ProductProductCategory",
+});
+
 Products.associate = function (models) {
   // define association here
   Products.hasMany(models.TransactionDetail, {
     foreignKey: "ProductId",
     as: "ProductTransactionDetail",
-  });
-  Products.belongsTo(models.Businesses, {
-    foreignKey: "BusinessId",
-    as: "ProductBusiness",
-  });
-  Products.belongsTo(models.ProductCategory, {
-    foreignKey: "ProductCategoryId",
-    as: "ProductProductCategory",
   });
 };
 export default Products;

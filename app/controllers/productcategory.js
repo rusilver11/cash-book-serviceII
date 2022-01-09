@@ -5,6 +5,12 @@ import database from "../config/connectionDatabase.js";
 
 const Op = Sequelize.Op;
 
+//associate
+ProductCategory.hasMany(Products, {
+  foreignKey: "ProductCategoryId",
+  as: "ProductProductCategory",
+})
+
 export const GetAllProductcategory = async (req, res) => {
   try {
     const businessid = req.params.id;
@@ -21,6 +27,47 @@ export const GetAllProductcategory = async (req, res) => {
     return res.status(400).send({ message: "Product category not found" });
   }
 };
+
+export const GetProductcategory = async (req, res) => {
+  try {
+    const businessid = req.params.businessid;
+    const productcategoryid = req.params.id
+    const Productcategory = await ProductCategory.findAll({
+      attributes: ["Id", "Name"],
+      where: {
+        Id: { [Op.eq]: productcategoryid },
+        BusinessId: { [Op.eq]: businessid },
+      },
+    });
+    return res.status(200).json(Productcategory);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ message: "Product category not found" });
+  }
+};
+
+export const GetAllProductsGroupByCategory = async (req, res) => {
+    try {
+      const businessid = req.params.businessid;
+      const transactiontypeid = req.params.typeid;
+      const products = await ProductCategory.findAll({
+        attributes: ["Id","Name"],
+        include: {
+            association: "ProductProductCategory",
+            attributes: ["Id", "Name", "EstimatePrice", "ProductCategoryId"]
+        },
+        where: {
+          BusinessId: { [Op.eq]: businessid },
+          "$ProductProductCategory.TransactionType$": {[Op.or]: [transactiontypeid,2]}
+        },
+        order: [["Name", "ASC"]],
+      });
+      return res.status(200).json(products);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: error.message });
+    }
+  };
 
 export const AddProductCategory = async (req, res) => {
   const { businessid, userid, name } = req.body;

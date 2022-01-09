@@ -5,8 +5,8 @@ import {getUsers,Login,VerifyOTP,Logout} from "../controllers/user.js";
 import {SendOTP,ResendOTP} from "../middlewares/waotp.js"
 import { Businesscategory } from "../controllers/businesscategory.js";
 import { GetBusinesses,GetAllBusinesses,AddBusinesses,EditBusinesses,DeleteBusinesses } from "../controllers/businesses.js";
-import { GetAllProductcategory,AddProductCategory,EditProductCategory,DeleteProductCategory } from "../controllers/productcategory.js";
-
+import { GetAllProductcategory,GetProductcategory,GetAllProductsGroupByCategory,AddProductCategory,EditProductCategory,DeleteProductCategory } from "../controllers/productcategory.js";
+import { GetAllProducts,GetProduct, AddProduct, EditProduct, DeleteProduct } from "../controllers/product.js" 
 
 const router = express.Router();
 
@@ -30,11 +30,17 @@ router.patch("/api/businesses/:id", EditBusinesses);
 router.delete("/api/businesses/:id", DeleteBusinesses);
 //sect product category
 router.get("/api/product-category/:id",GetAllProductcategory);
+router.get("/api/product-category/:businessid/:id",GetProductcategory);
+router.get("/api/product-category/:businessid/:typeid",GetAllProductsGroupByCategory);
 router.post("/api/product-category",AddProductCategory);
 router.patch("/api/product-category/:businessid/:id",EditProductCategory)
 router.delete("/api/product-category/:businessid/:id",DeleteProductCategory)
 //sect product
-
+router.get("/api/products/:businessid/:typeid",GetAllProducts);
+router.get("/api/products/:businessid/:typeid/:id",GetProduct);
+router.post("/api/products",AddProduct);
+router.patch("/api/products/:businessid/:id",EditProduct);
+router.delete("/api/products/:businessid/:id",DeleteProduct);
 
 
 export default router

@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/connectionDatabase.js";
 import Businesses from "./businesses.js";
+// import Products from "./products.js";
 
 const { DataTypes } = Sequelize;
 const ProductCategory = db.define(
@@ -16,6 +17,7 @@ const ProductCategory = db.define(
     },
     BusinessId: {
       type: DataTypes.UUID,
+      allowNull:false
     },
     CreatedBy: {
       type: DataTypes.STRING,
@@ -36,6 +38,10 @@ ProductCategory.belongsTo(Businesses, {
   foreignKey: "BusinessId",
   as: "ProductCategoryBusiness",
 });
+// ProductCategory.hasMany(Products, {
+//   foreignKey: "ProductCategoryId",
+//   as: "ProductProductCategory",
+// });
 
 // ProductCategory.associate = function (models) {
 //   // define association here
