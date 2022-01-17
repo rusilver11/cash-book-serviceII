@@ -12,14 +12,9 @@ const Persons = db.define(
     },
     UserId: {
       type: DataTypes.UUID,
+      allowNull: false
     },
-    Name: {
-      type: DataTypes.STRING,
-    },
-    Phone: {
-      type: DataTypes.STRING,
-    },
-    CreatedBy: {
+    ContactId: {
       type: DataTypes.STRING,
     },
     CreatedAt: {

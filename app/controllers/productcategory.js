@@ -24,7 +24,7 @@ export const GetAllProductcategory = async (req, res) => {
     return res.status(200).json(Productcategory);
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ message: "Product category not found" });
+    return res.status(400).send({ message: error.message });
   }
 };
 
@@ -42,7 +42,7 @@ export const GetProductcategory = async (req, res) => {
     return res.status(200).json(Productcategory);
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ message: "Product category not found" });
+    return res.status(400).send({ message: error.message});
   }
 };
 
@@ -73,7 +73,7 @@ export const AddProductCategory = async (req, res) => {
   const { businessid, userid, name } = req.body;
   const t = await database.transaction();
   try {
-    const createproductcategory = await ProductCategory.create(
+    const createProductcategory = await ProductCategory.create(
       {
         BusinessId: businessid,
         CreatedBy: userid,
@@ -87,7 +87,7 @@ export const AddProductCategory = async (req, res) => {
       { transaction: t }
     );
     return (
-      await t.commit(), res.status(200).json({ result: createproductcategory })
+      await t.commit(), res.status(200).json({ result: createProductcategory })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });

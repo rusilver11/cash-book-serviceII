@@ -7,9 +7,12 @@ const {DataTypes} = Sequelize;
 const TransactionDetail = db.define("TransactionDetail",{
   TransactionId:{
    type: DataTypes.UUID,
+   primaryKey: true,
   },
   ProductId:{ 
-   type: DataTypes.UUID
+   type: DataTypes.UUID,
+   allowNull: false,
+   foreignKey: true
   },
   Qty:{
    type: DataTypes.DECIMAL,
@@ -23,11 +26,11 @@ const TransactionDetail = db.define("TransactionDetail",{
   },
 },{freezeTableName:true});
 
-TransactionDetail.belongsTo(models.Transactions,{
+TransactionDetail.belongsTo(Transactions,{
   foreignKey: 'TransactionId',
   as: 'TransactionDetailTransaction'
 });
-TransactionDetail.belongsTo(models.Products,{
+TransactionDetail.belongsTo(Products,{
   foreignKey: 'ProductId',
   as: 'TransactionDetailProduct'
 });  

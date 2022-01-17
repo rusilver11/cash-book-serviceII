@@ -4,7 +4,7 @@ import BusinessCategory from "./businesscategory.js";
 import Users from "./users.js";
 
 const {DataTypes} = Sequelize;
- export const Businesses = db.define("Businesses",{
+const Businesses = db.define("Businesses",{
     Id:{
       type: DataTypes.UUID,
       primaryKey: true,

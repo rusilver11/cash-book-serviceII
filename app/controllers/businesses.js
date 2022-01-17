@@ -18,7 +18,7 @@ export const GetAllBusinesses = async (req, res) => {
     return res.status(200).json(findBusinesses);
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ message: "Businesses not found" });
+    return res.status(400).send({ message: error.message });
   }
 };
 
@@ -39,7 +39,7 @@ export const GetBusinesses = async (req, res) => {
     return res.status(200).json(findBusinesses);
   } catch (error) {
     console.log(error);
-    return res.status(400).send({ message: "Businesses not found" });
+    return res.status(400).send({ message: error.message });
   }
 };
 

@@ -6,7 +6,9 @@ import {SendOTP,ResendOTP} from "../middlewares/waotp.js"
 import { Businesscategory } from "../controllers/businesscategory.js";
 import { GetBusinesses,GetAllBusinesses,AddBusinesses,EditBusinesses,DeleteBusinesses } from "../controllers/businesses.js";
 import { GetAllProductcategory,GetProductcategory,GetAllProductsGroupByCategory,AddProductCategory,EditProductCategory,DeleteProductCategory } from "../controllers/productcategory.js";
-import { GetAllProducts,GetProduct, AddProduct, EditProduct, DeleteProduct } from "../controllers/product.js" 
+import { GetAllProducts,GetProduct, AddProduct, EditProduct, DeleteProduct } from "../controllers/products.js" ;
+import { GetAllContact, AddContact } from "../controllers/persons.js";
+import {AddTransaction} from "../controllers/transaction.js";
 
 const router = express.Router();
 
@@ -41,6 +43,12 @@ router.get("/api/products/:businessid/:typeid/:id",GetProduct);
 router.post("/api/products",AddProduct);
 router.patch("/api/products/:businessid/:id",EditProduct);
 router.delete("/api/products/:businessid/:id",DeleteProduct);
+//sect persons
+router.get("/api/persons/:userid",GetAllContact);
+router.post("/api/persons",AddContact);
+//Transactions
+router.post("/api/transaction",AddTransaction);
+
 
 
 export default router

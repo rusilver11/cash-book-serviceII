@@ -1,16 +1,19 @@
 import {Sequelize} from "sequelize" ;
 import db from "../config/connectionDatabase.js";
+import Persons from "./persons.js";
+import Businesses from "./businesses.js";
 
 const {DataTypes} = Sequelize;
 const Transactions = db.define("Transactions",{
   Id: {
     type: DataTypes.UUID,
-    primaryKey:true,
-    defaultValue: DataTypes.UUID4
+    defaultValue: DataTypes.UUID4,
+    primaryKey: true
   },
-  TransactionAt:{ 
+  TransactionDate:{ 
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
+    allowNull: false
   },
   Status:{ 
     type:DataTypes.STRING
@@ -32,7 +35,8 @@ const Transactions = db.define("Transactions",{
     type:DataTypes.UUID
   },
   BusinessId:{ 
-    type:DataTypes.UUID
+    type:DataTypes.UUID,
+    allowNull: false
   },
   CreatedBy:{ 
     type:DataTypes.STRING
@@ -47,19 +51,21 @@ const Transactions = db.define("Transactions",{
   }
 },{freezeTableName:true});
 
-Transactions.associate = function(models) {
-  // define association here
-  Transactions.hasMany(models.TransactionDetail,{
-    foreignKey: 'TransactiId',
-    as: 'TransactionDetailId'
-  });
-  Transactions.belongsTo(models.Persons,{
-    foreignKey: 'PersonId',
-    as: 'TransactionPerson'
-  });
-  Transactions.belongsTo(models.Businesses,{
-    foreignKey: 'BusinessId',
-    as: 'TransactionBusiness'
-  });   
-};
+Transactions.belongsTo(Persons,{
+  foreignKey: 'PersonId',
+  as: 'TransactionPerson'
+});
+Transactions.belongsTo(Businesses,{
+  foreignKey: 'BusinessId',
+  as: 'TransactionBusiness'
+});  
+
+// Transactions.associate = function(models) {
+//   // define association here
+//   Transactions.hasMany(models.TransactionDetail,{
+//     foreignKey: 'TransactiId',
+//     as: 'TransactionDetailId'
+//   });
+ 
+// };
 export default Transactions;
