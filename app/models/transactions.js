@@ -13,20 +13,37 @@ const Transactions = db.define("Transactions",{
   TransactionDate:{ 
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
-    allowNull: false
+    allowNull: false,
+    validate:{
+      isDate:true
+    }
   },
-  Status:{ 
-    type:DataTypes.STRING
+  FlagStatus:{ 
+    type:DataTypes.INTEGER,  //0 = lunas, 1 = belum lunas
+    defaultValue: 0,
+    allowNull:false,
+    validate:{
+      isIn: [[0,1]]
+    }
   },
   Description:{ 
     type:DataTypes.STRING
   },
-  Amount:{ 
+  AmountIn:{ 
     type:DataTypes.DECIMAL,
     defaultValue:0
   },
-  TransactionType:{ 
-    type:DataTypes.STRING
+  AmountOut:{ 
+    type:DataTypes.DECIMAL,
+    defaultValue:0
+  },
+  FlagTransactionType:{ 
+    type:DataTypes.INTEGER, //0 = pemasukan, 1 = pengeluaran
+    defaultValue: 0,
+    allowNull:false,
+    validate:{
+      isIn: [[0,1]]
+    }
   },
   PaymentType:{ 
     type:DataTypes.STRING

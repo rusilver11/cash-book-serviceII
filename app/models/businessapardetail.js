@@ -6,8 +6,10 @@ const BusinessApArDetail = db.define("BusinessApArDetail",{
   BusinessApArId:{ 
     type:DataTypes.UUID
   },
-  BusinessApArDetailAt:{ 
-    type:DataTypes.DATE
+  BusinessApArDetailDate:{ 
+    type:DataTypes.DATE,
+    defaultValue:DataTypes.NOW,
+    allowNull: false
   },
   Amount:{ 
     type:DataTypes.DECIMAL,
@@ -16,8 +18,10 @@ const BusinessApArDetail = db.define("BusinessApArDetail",{
   Description:{ 
     type:DataTypes.STRING
   },
-  ApArType:{ 
-    type:DataTypes.STRING
+  FlagApArIn:{ 
+    type:DataTypes.INTEGER, //0 = keluar, 1 = masuk
+    defaultValue:0,
+    allowNull:false
   },
   CreatedBy:{ 
     type:DataTypes.STRING

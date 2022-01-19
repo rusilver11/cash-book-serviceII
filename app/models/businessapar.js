@@ -10,8 +10,10 @@ const BusinessApAr = db.define(
       primaryKey: true,
       defaultValue: DataTypes.UUID4,
     },
-    ApArAt: {
+    ApArDate: {
       type: DataTypes.DATE,
+      defaultValue:DataTypes.NOW,
+      allowNull:false
     },
     TotalAmount: {
       type: DataTypes.DECIMAL,
@@ -22,15 +24,16 @@ const BusinessApAr = db.define(
     },
     PersonId: {
       type: DataTypes.UUID,
+      allowNull: false,
     },
     DueDate: {
       type: DataTypes.DATE,
     },
-    StatusPayment: {
-      type: DataTypes.STRING,
+    FlagStatusPayment: {
+      type: DataTypes.INTEGER, //0 = lunas, 1 = belum lunas
     },
-    ApArType: {
-      type: DataTypes.STRING,
+    FlagApArType: {
+      type: DataTypes.INTEGER, //0 = hutang, 1 = Piutang
     },
     BusinessId:{ 
       type: DataTypes.UUID 

@@ -2,17 +2,63 @@ import Transactions from "../models/transactions.js";
 import TransactionDetail from "../models/transactiondetail.js";
 import Sequelize from "sequelize";
 import database from "../config/connectionDatabase.js";
+import date from "date-and-time";
 
 const Op = Sequelize.Op;
+
+export const GetTransactionByDate = async (req,res) =>{
+
+  try {
+    const Businessid = req.params.businessid;
+    const StartDate = req.params.startdate;
+    const EndDate = req.params.enddate;
+
+    let convrtStartDate = new Date(StartDate);
+    let convrtEndDate = new Date(EndDate);
+    let newStartDate = date.format(convrtStartDate, 'YYYY-MM-DD');
+    let newEndDate = date.format(convrtEndDate, 'YYYY-MM-DD');
+    
+    let qrydate = Sequelize.where(
+      Sequelize.cast(Sequelize.col("TransactionDate"),"DATE"),
+      {[Op.between]: [newStartDate,newEndDate] }
+    )
+
+    const findTransactionByMonth = await Transactions.findAll({
+      attributes: ["Id","TransactionDate","FlagTransactionType","FlagStatus","AmountIn","AmountOut","Description"],
+      where:{
+        BusinessId: {[Op.eq]:Businessid},
+        TransactionDate: qrydate
+      },
+      order: [["TransactionDate"]],
+      
+    });
+
+    const findTransactionBalance = await Transactions.findAll({
+      attributes:[
+        [database.Sequelize.fn("SUM",database.Sequelize.col("AmountIn")),"Income"],
+        [database.Sequelize.fn("SUM",database.Sequelize.col("AmountOut")),"Outcome"]
+      ],
+      where:{
+        BusinessId: {[Op.eq]:Businessid},
+        TransactionDate: qrydate
+      },
+    });
+    
+    return res.status(200).json({Balance:findTransactionBalance,Transaction:findTransactionByMonth});
+  } catch (error) {
+    return res.status(400).send({message: error.message});
+  }
+}
 
 export const AddTransaction = async (req, res) => {
   const {
     businessid,
     userid,
     transactiondate,
-    transactiontype,
+    flagtransactiontype,
     status,
-    amount,
+    amountin,
+    amountout,
     description,
     paymenttype,
     productid,
@@ -22,14 +68,19 @@ export const AddTransaction = async (req, res) => {
   const t = await database.transaction();
 
   try {
-    let transactiondt = [];
 
+    if(flagtransactiontype === 1 && amountin !== null){
+      return res.status(400).send({message: "TransactionType Outcome not allowed input Amount Income"})
+    }
+
+    let transactiondt = [];
     await Transactions.create(
       {
         TransactionDate: transactiondate,
-        TransactionType: transactiontype,
-        Status: status,
-        Amount: amount,
+        FlagTransactionType: flagtransactiontype,
+        FlagStatus: status,
+        AmountIn: amountin,
+        AmountOut: amountout,
         Description: description,
         PaymentType: paymenttype,
         BusinessId: businessid,
@@ -40,8 +91,8 @@ export const AddTransaction = async (req, res) => {
       {
         fields: [
           "TransactionDate",
-          "TransactionType",
-          "Status",
+          "FlagTransactionType",
+          "FlagStatus",
           "Amount",
           "Description",
           "PaymentType",
@@ -81,3 +132,17 @@ export const AddTransaction = async (req, res) => {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
 };
+
+export const EditTransaction = async(req,res) =>{
+  const Transactionid = req.params.transactionid;
+  const Businessid = req.params.businessid;
+
+  const t = await database.transaction();
+  try {
+    await Transactions.update({
+    })
+    
+  } catch (error) {
+    
+  }
+}

@@ -8,7 +8,7 @@ import { GetBusinesses,GetAllBusinesses,AddBusinesses,EditBusinesses,DeleteBusin
 import { GetAllProductcategory,GetProductcategory,GetAllProductsGroupByCategory,AddProductCategory,EditProductCategory,DeleteProductCategory } from "../controllers/productcategory.js";
 import { GetAllProducts,GetProduct, AddProduct, EditProduct, DeleteProduct } from "../controllers/products.js" ;
 import { GetAllContact, AddContact } from "../controllers/persons.js";
-import {AddTransaction} from "../controllers/transaction.js";
+import {AddTransaction, GetTransactionByDate} from "../controllers/transaction.js";
 
 const router = express.Router();
 
@@ -48,6 +48,7 @@ router.get("/api/persons/:userid",GetAllContact);
 router.post("/api/persons",AddContact);
 //Transactions
 router.post("/api/transaction",AddTransaction);
+router.get("/api/transaction/:businessid/:startdate/:enddate",GetTransactionByDate);
 
 
 

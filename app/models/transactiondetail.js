@@ -7,7 +7,7 @@ const {DataTypes} = Sequelize;
 const TransactionDetail = db.define("TransactionDetail",{
   TransactionId:{
    type: DataTypes.UUID,
-   primaryKey: true,
+   unique: true,
   },
   ProductId:{ 
    type: DataTypes.UUID,

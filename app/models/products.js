@@ -15,7 +15,7 @@ const Products = db.define(
     Name: {
       type: DataTypes.STRING,
     },
-    TransactionType: {
+    FlagTransactionType: {
       type: DataTypes.INTEGER, //0 = pemasukan, 1 = pengeluaran, 2 = semua
       defaultValue: 0,
       allowNull:false
