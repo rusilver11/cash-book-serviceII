@@ -58,7 +58,7 @@ export const GetAllProductsGroupByCategory = async (req, res) => {
         },
         where: {
           BusinessId: { [Op.eq]: businessid },
-          "$ProductProductCategory.TransactionType$": {[Op.or]: [transactiontypeid,2]}
+          "$ProductProductCategory.FlagTransactionType$": {[Op.or]: [transactiontypeid,2]}
         },
         order: [["Name", "ASC"]],
       });

@@ -1,6 +1,6 @@
 import BusinessCategory from "../models/businesscategory.js";
 
-export const Businesscategory = async (req, res) => {
+export const GetAllBusinesscategory = async (req, res) => {
     try {
         const Businesscategory = await BusinessCategory.findAll({
             attributes: ["Id","Name"]
