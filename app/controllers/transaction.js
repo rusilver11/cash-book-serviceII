@@ -6,6 +6,12 @@ import date from "date-and-time";
 
 const Op = Sequelize.Op;
 
+//associate
+Transactions.hasMany(TransactionDetail, {
+  foreignKey: "TransactionId",
+  as: "TransactionDt",
+});
+
 export const GetTransactionByDate = async (req, res) => {
   try {
     const Businessid = req.params.businessid;
@@ -69,11 +75,6 @@ export const GetTransaction = async (req, res) => {
   try {
     const Transactionid = req.params.id;
     const Businessid = req.params.businessid;
-
-    Transactions.hasMany(TransactionDetail, {
-      foreignKey: "TransactionId",
-      as: "TransactionDt",
-    });
 
     const findTransactionByMonth = await Transactions.findAll({
       attributes: [
