@@ -22,7 +22,15 @@ export const GetTransactionDetail = async (req, res) => {
       attributes: ["Id", "Name"],
       include: {
         association: "TransactionDtProduct",
-        attributes: { exclude:["FlagTransactionType", "ProductCategoryId", "BusinessId", "CreatedBy", "CreatedAt","UpdatedAt"],
+        attributes: {
+          exclude: [
+            "FlagTransactionType",
+            "ProductCategoryId",
+            "BusinessId",
+            "CreatedBy",
+            "CreatedAt",
+            "UpdatedAt",
+          ],
           include: [
             [
               Sequelize.literal(
@@ -31,19 +39,80 @@ export const GetTransactionDetail = async (req, res) => {
                         from "TransactionDetail" as x
                         where x."ProductId" = "TransactionDtProduct"."Id"
                         and"TransactionId" = '${Transactionid}'
-                ),0))`),"Qty"
+                ),0))`
+              ),
+              "Qty",
             ],
           ],
         },
       },
       where: {
         BusinessId: { [Op.eq]: Businessid },
-        "$TransactionDtProduct.FlagTransactionType$": { [Op.or]: [Transactiontypeid, 2]},
+        "$TransactionDtProduct.FlagTransactionType$": {
+          [Op.or]: [Transactiontypeid, 2],
+        },
       },
       order: [["Name", "ASC"]],
     });
-    return res.status(200).json({result: products});
+    return res.status(200).json({ result: products });
   } catch (error) {
-    return res.status(400).json({message: error.message})
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const EditTransactionDetail = async (req, res) => {
+  const Transactionid = req.params.transactionid;
+  const { Productid, Qty } = req.body;
+  const t = await database.transaction();
+  try {
+    if (Array.isArray(Productid)) {
+      for (let i = 0; i < Productid.length; i++) {
+        if (Qty[i] == 0) {
+          await TransactionDetail.destroy(
+            {
+              where: {
+                TransactionId: Transactionid,
+                ProductId: Productid[i],
+              },
+            },
+            { transaction: t }
+          );
+        } else {
+          await TransactionDetail.update(
+            {
+              Qty: Qty[i],
+              UpdateAt: Date.now(),
+            },
+            {
+              where: {
+                TransactionId: Transactionid,
+                ProductId: Productid[i],
+              },
+            },
+            { transactionid: t }
+          );
+        }
+      }
+    } else {
+      await TransactionDetail.update(
+        {
+          Qty: Qty,
+          UpdateAt: Date.now(),
+        },
+        {
+          where: {
+            TransactionId: Transactionid,
+            ProductId: Productid,
+          },
+        },
+        { transactionid: t }
+      );
+    }
+    return (
+      await t.commit(),
+      res.status(200).json({ message: "Transaction detail updated" })
+    );
+  } catch (error) {
+    return await t.rollback(), res.status(400).json({ message: error.message });
   }
 };
