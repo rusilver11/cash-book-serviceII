@@ -128,6 +128,8 @@ export const AddTransaction = async (req, res) => {
     }
 
     let transactiondt = [];
+    let countdetail;
+
     await Transactions.create(
       {
         TransactionDate: transactiondate,
@@ -158,33 +160,85 @@ export const AddTransaction = async (req, res) => {
       },
       { transaction: t }
     ).then((createTransaction) => {
-      for (let i = 0; i < productid.length; i++) {
+      if (Array.isArray(productid)) {
+        for (let i = 0; i < productid.length; i++) {
+          let detailobj = {
+            TransactionId: createTransaction.Id,
+            ProductId: productid[i],
+            Qty: qty[i],
+            CreatedAt: Date.now(),
+            UpdatedAt: Date.now(),
+          };
+          transactiondt.push(detailobj);
+        }
+      } else {
+        countdetail = 0;
         let detailobj = {
           TransactionId: createTransaction.Id,
-          ProductId: productid[i],
-          Qty: qty[i],
+          ProductId: productid,
+          Qty: qty,
           CreatedAt: Date.now(),
           UpdatedAt: Date.now(),
         };
         transactiondt.push(detailobj);
       }
     });
-
-    await TransactionDetail.bulkCreate(
-      transactiondt,
-      {
-        fields: ["TransactionId", "ProductId", "Qty", "CreatedAt", "UpdatedAt"],
-      },
-      { transaction: t }
-    )
-      .then(() => {
-        return (
-          t.commit(), res.status(200).json({ message: "Transaction Created" })
-        );
-      })
-      .catch((error) => {
-        return t.rollback(), res.status(400).send({ message: error.message });
+    if (countdetail != 0) {
+      await TransactionDetail.bulkCreate(
+        transactiondt,
+        {
+          fields: [
+            "TransactionId",
+            "ProductId",
+            "Qty",
+            "CreatedAt",
+            "UpdatedAt",
+          ],
+        },
+        { transaction: t }
+      )
+        .then(() => {
+          return (
+            t.commit(), res.status(200).json({ message: "Transaction Created" })
+          );
+        })
+        .catch((error) => {
+          return t.rollback(), res.status(400).send({ message: error.message });
+        });
+    } else {
+      transactiondt.forEach((e) => {
+        TransactionDetail.create(
+          {
+            TransactionId: e.TransactionId,
+            ProductId: e.ProductId,
+            Qty: e.Qty,
+            CreatedAt: e.CreatedAt,
+            UpdatedAt: e.UpdatedAt,
+          },
+          {
+            fields: [
+              "TransactionId",
+              "ProductId",
+              "Qty",
+              "CreatedAt",
+              "UpdatedAt",
+            ],
+          },
+          { transaction: t }
+        )
+          .then(() => {
+            return (
+              t.commit(),
+              res.status(200).json({ message: "Transaction Created" })
+            );
+          })
+          .catch((error) => {
+            return (
+              t.rollback(), res.status(400).send({ message: error.message })
+            );
+          });
       });
+    }
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }

@@ -60,39 +60,79 @@ export const GetTransactionDetail = async (req, res) => {
   }
 };
 
+export const AddTransactionDetail = async (req, res) => {
+  const Transactionid = req.params.transactionid;
+  const { Productid, Qty } = req.body;
+  const t = await database.transaction();
+  try {
+    if (Array.isArray(Productid)) {
+      let transactiondt = [];
+      for (let i = 0; i < Productid.length; i++) {
+        let detailobj = {
+          TransactionId: Transactionid,
+          ProductId: Productid[i],
+          Qty: Qty[i],
+          CreatedAt: Date.now(),
+          UpdatedAt: Date.now(),
+        };
+        transactiondt.push(detailobj);
+      }
+      await TransactionDetail.bulkCreate(transactiondt, { transaction: t });
+    } else {
+      await TransactionDetail.create(
+        {
+          TransactionId: Transactionid,
+          ProductId: Productid,
+          Qty: Qty,
+          CreatedAt: Date.now(),
+          UpdatedAt: Date.now(),
+        },
+        { transactionid: t }
+      );
+    }
+    return (
+      await t.commit(),
+      res.status(200).json({ message: "Transaction detail Created" })
+    );
+  } catch (error) {
+    return await t.rollback(), res.status(400).json({ message: error.message });
+  }
+};
+
 export const EditTransactionDetail = async (req, res) => {
   const Transactionid = req.params.transactionid;
   const { Productid, Qty } = req.body;
   const t = await database.transaction();
   try {
     if (Array.isArray(Productid)) {
-      for (let i = 0; i < Productid.length; i++) {
+      Productid.forEach((Productidarr) => {
+        //if qty product set to zero means delete from detail transaction
         if (Qty[i] == 0) {
-          await TransactionDetail.destroy(
+          TransactionDetail.destroy(
             {
               where: {
-                TransactionId: Transactionid,
-                ProductId: Productid[i],
+                TransactionId: { [Op.eq]: Transactionid },
+                ProductId: { [Op.eq]: Productidarr },
               },
             },
             { transaction: t }
           );
         } else {
-          await TransactionDetail.update(
+          TransactionDetail.update(
             {
               Qty: Qty[i],
               UpdateAt: Date.now(),
             },
             {
               where: {
-                TransactionId: Transactionid,
-                ProductId: Productid[i],
+                TransactionId: { [Op.eq]: Transactionid },
+                ProductId: { [Op.eq]: Productidarr },
               },
             },
             { transactionid: t }
           );
         }
-      }
+      });
     } else {
       await TransactionDetail.update(
         {
@@ -101,8 +141,8 @@ export const EditTransactionDetail = async (req, res) => {
         },
         {
           where: {
-            TransactionId: Transactionid,
-            ProductId: Productid,
+            TransactionId: { [Op.eq]: Transactionid },
+            ProductId: { [Op.eq]: Productid },
           },
         },
         { transactionid: t }
@@ -111,6 +151,43 @@ export const EditTransactionDetail = async (req, res) => {
     return (
       await t.commit(),
       res.status(200).json({ message: "Transaction detail updated" })
+    );
+  } catch (error) {
+    return await t.rollback(), res.status(400).json({ message: error.message });
+  }
+};
+
+export const DeleteTransactionDetail = async (req, res) => {
+  const Transactionid = req.params.transactionid;
+  const { Productid } = req.body;
+  const t = await database.transaction();
+  try {
+    if (Array.isArray(Productid)) {
+      Productid.forEach((productarr) => {
+        TransactionDetail.destroy(
+          {
+            where: {
+              ProductId: { [Op.eq]: productarr },
+              TransactionId: { [Op.eq]: Transactionid },
+            },
+          },
+          { transaction: t }
+        );
+      });
+    } else {
+      TransactionDetail.destroy(
+        {
+          where: {
+            ProductId: { [Op.eq]: Productid },
+            TransactionId: { [Op.eq]: Transactionid },
+          },
+        },
+        { transaction: t }
+      );
+    }
+    return (
+      await t.commit(),
+      res.status(200).json({ message: "Transaction detail Deleted" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });

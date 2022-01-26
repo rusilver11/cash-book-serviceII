@@ -34,7 +34,7 @@ import {
   EditTransaction,
   DeleteTransaction,
 } from "../controllers/transaction.js";
-import { EditTransactionDetail, GetTransactionDetail } from "../controllers/transactiondetail.js"
+import { GetTransactionDetail,AddTransactionDetail,EditTransactionDetail,DeleteTransactionDetail } from "../controllers/transactiondetail.js"
 
 const router = express.Router();
 
@@ -82,7 +82,9 @@ router.post("/api/transaction", AddTransaction);
 router.patch("/api/transaction/:businessid/:id", EditTransaction);
 router.delete("/api/transaction/:businessid/:id", DeleteTransaction);
 //sect TransactionDetail
-router.get("/api/transaction-detail/:businessid/:typeid/:transactionid",GetTransactionDetail);
-router.patch("/api/transaction-detail/:transactionid",EditTransactionDetail);
+router.get("/api/transaction-detail/:businessid/:typeid/:transactionid", GetTransactionDetail);
+router.post("/api/transaction-detail/:transactionid", AddTransactionDetail);
+router.patch("/api/transaction-detail/:transactionid", EditTransactionDetail);
+router.delete("/api/transaction-detail/:transactionid", DeleteTransactionDetail);
 
 export default router;
