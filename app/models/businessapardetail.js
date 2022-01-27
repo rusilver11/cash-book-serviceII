@@ -3,10 +3,17 @@ import db from "../config/connectionDatabase.js";
 
 const {DataTypes} = Sequelize;
 const BusinessApArDetail = db.define("BusinessApArDetail",{
-  BusinessApArId:{ 
-    type:DataTypes.UUID
+  Id:{ 
+    type:DataTypes.UUID,
+    primaryKey:true,
+    defaultValue:DataTypes.UUID4
   },
-  BusinessApArDetailDate:{ 
+  BusinessApArId:{ 
+    type:DataTypes.UUID,
+    foreignKey:true,
+    allowNull:false
+  },
+  ApArDate:{ 
     type:DataTypes.DATE,
     defaultValue:DataTypes.NOW,
     allowNull: false

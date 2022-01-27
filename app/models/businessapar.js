@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/connectionDatabase.js";
+import Businesses from "./businesses.js";
+import Persons from "./persons.js";
 
 const { DataTypes } = Sequelize;
 const BusinessApAr = db.define(
@@ -10,33 +12,20 @@ const BusinessApAr = db.define(
       primaryKey: true,
       defaultValue: DataTypes.UUID4,
     },
-    ApArDate: {
-      type: DataTypes.DATE,
-      defaultValue:DataTypes.NOW,
-      allowNull:false
-    },
-    TotalAmount: {
-      type: DataTypes.DECIMAL,
-      defaultValue: 0,
-    },
-    Description: {
-      type: DataTypes.STRING,
-    },
     PersonId: {
       type: DataTypes.UUID,
       allowNull: false,
     },
     DueDate: {
       type: DataTypes.DATE,
-    },
-    FlagStatusPayment: {
-      type: DataTypes.INTEGER, //0 = lunas, 1 = belum lunas
-    },
-    FlagApArType: {
-      type: DataTypes.INTEGER, //0 = hutang, 1 = Piutang
+      defaultValue: DataTypes.NOW
     },
     BusinessId:{ 
       type: DataTypes.UUID 
+    },
+    CreatedBy: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUID4,
     },
     CreatedAt:{ 
       type:DataTypes.DATE,
@@ -50,19 +39,22 @@ const BusinessApAr = db.define(
   { freezeTableName: true }
 );
 
-BusinessApAr.associate = function (models) {
-  // define association here
-  BusinessApAr.hasMany(models.BusinessApArDetail, {
-    foreignKey: "BusinessApArId",
-    as: "BusinessApArBusinessApArDetail",
-  });
-  BusinessApAr.belongsTo(models.Businesses, {
-    foreignKey: "BusinessId",
-    as: "BusinessApArBusiness",
-  });
-  BusinessApAr.belongsTo(models.Persons, {
-    foreignKey: "PersonId",
-    as: "BusinessApArPerson",
-  });
-};
+
+// BusinessApAr.hasMany(models.BusinessApArDetail, {
+//   foreignKey: "BusinessApArId",
+//   as: "BusinessApArBusinessApArDetail",
+// });
+BusinessApAr.belongsTo(Businesses, {
+  foreignKey: "BusinessId",
+  as: "BusinessApArBusiness",
+});
+BusinessApAr.belongsTo(Persons, {
+  foreignKey: "PersonId",
+  as: "BusinessApArPerson",
+});
+
+// BusinessApAr.associate = function (models) {
+//   // define association here
+// };
+
 export default BusinessApAr;

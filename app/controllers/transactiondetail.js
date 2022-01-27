@@ -2,7 +2,6 @@ import Sequelize from "sequelize";
 import database from "../config/connectionDatabase.js";
 import ProductCategory from "../models/productcategory.js";
 import Products from "../models/products.js";
-import Transactions from "../models/transactions.js";
 import TransactionDetail from "../models/transactiondetail.js";
 const Op = Sequelize.Op;
 

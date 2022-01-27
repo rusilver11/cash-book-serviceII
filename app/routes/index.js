@@ -34,7 +34,13 @@ import {
   EditTransaction,
   DeleteTransaction,
 } from "../controllers/transaction.js";
-import { GetTransactionDetail,AddTransactionDetail,EditTransactionDetail,DeleteTransactionDetail } from "../controllers/transactiondetail.js"
+import {
+  GetTransactionDetail,
+  AddTransactionDetail,
+  EditTransactionDetail,
+  DeleteTransactionDetail,
+} from "../controllers/transactiondetail.js";
+import { AddBusinessApAr,EditBusinessApAr,DeletedBusinessApAr } from "../controllers/businessapar.js";
 
 const router = express.Router();
 
@@ -62,7 +68,7 @@ router.delete("/api/businesses/:id", DeleteBusinesses);
 //sect product category
 router.get("/api/product-category/:id", GetAllProductcategory);
 router.get("/api/product-category/:businessid/:id", GetProductcategory);
-router.get("/api/product-category/products/:businessid/:typeid",GetAllProductsGroupByCategory);
+router.get( "/api/product-category/products/:businessid/:typeid", GetAllProductsGroupByCategory);
 router.post("/api/product-category", AddProductCategory);
 router.patch("/api/product-category/:businessid/:id", EditProductCategory);
 router.delete("/api/product-category/:businessid/:id", DeleteProductCategory);
@@ -76,15 +82,19 @@ router.delete("/api/products/:businessid/:id", DeleteProduct);
 router.get("/api/persons/:userid", GetAllContact);
 router.post("/api/persons", AddContact);
 //sect Transactions
-router.get("/api/transaction/:businessid/:startdate/:enddate",GetTransactionByDate);
+router.get("/api/transaction/:businessid/:startdate/:enddate", GetTransactionByDate);
 router.get("/api/transaction/:businessid/:id", GetTransaction);
 router.post("/api/transaction", AddTransaction);
 router.patch("/api/transaction/:businessid/:id", EditTransaction);
 router.delete("/api/transaction/:businessid/:id", DeleteTransaction);
 //sect TransactionDetail
-router.get("/api/transaction-detail/:businessid/:typeid/:transactionid", GetTransactionDetail);
+router.get("/api/transaction-detail/:businessid/:typeid/:transactionid",GetTransactionDetail);
 router.post("/api/transaction-detail/:transactionid", AddTransactionDetail);
 router.patch("/api/transaction-detail/:transactionid", EditTransactionDetail);
-router.delete("/api/transaction-detail/:transactionid", DeleteTransactionDetail);
+router.delete("/api/transaction-detail/:transactionid",DeleteTransactionDetail);
+//sect BusinessApAr
+router.post("/api/businessapar", AddBusinessApAr);
+router.patch("/api/businessapar/:businessid/:businessaparid", EditBusinessApAr);
+router.delete("/api/businessapar/:businessid/:businessaparid", EditBusinessApAr);
 
 export default router;

@@ -1,4 +1,4 @@
-import Persons from "../models/products.js";
+import Persons from "../models/persons.js";
 import Sequelize from "sequelize";
 import database from "../config/connectionDatabase.js";
 
