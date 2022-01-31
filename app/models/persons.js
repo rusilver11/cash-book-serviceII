@@ -2,8 +2,7 @@ import { Sequelize } from "sequelize";
 import db from "../config/connectionDatabase.js";
 
 const { DataTypes } = Sequelize;
-const Persons = db.define(
-  "Persons",
+const Persons = db.define("Persons",
   {
     Id: {
       type: DataTypes.UUID,
