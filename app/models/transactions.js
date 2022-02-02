@@ -22,7 +22,7 @@ const Transactions = db.define(
       },
     },
     FlagStatus: {
-      type: DataTypes.INTEGER, //0 = lunas, 1 = belum lunas
+      type: DataTypes.INTEGER, //0 = belum lunas, 1 = lunas
       defaultValue: 0,
       allowNull: false,
       validate: {

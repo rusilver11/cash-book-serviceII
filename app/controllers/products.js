@@ -17,7 +17,7 @@ export const GetAllProducts = async (req, res) => {
       attributes: ["Id", "Name", "EstimatePrice", "ProductCategoryId"],
       where: {
         BusinessId: { [Op.eq]: businessid },
-        TransactionType: { [Op.or]: [transactiontype, 2] },
+        FlagTransactionType: { [Op.or]: [transactiontype, 2] },
       },
       order: [["Name", "ASC"]],
     });

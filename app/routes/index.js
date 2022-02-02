@@ -41,7 +41,7 @@ import {
   DeleteTransactionDetail,
 } from "../controllers/transactiondetail.js";
 import { GetBusinessApAr,AddBusinessApAr,EditBusinessApAr,DeleteBusinessApAr } from "../controllers/businessapar.js";
-
+import { GetBusinessApArDetail,AddBusinessApArDetail } from "../controllers/businessapardetail.js";
 const router = express.Router();
 
 //home
@@ -97,5 +97,8 @@ router.get("/api/businessapar/:businessid",GetBusinessApAr);
 router.post("/api/businessapar", AddBusinessApAr);
 router.patch("/api/businessapar/:businessid/:businessaparid", EditBusinessApAr);
 router.delete("/api/businessapar/:businessid/:businessaparid", DeleteBusinessApAr);
+//sect BusinessApArDetail
+router.get("/api/businessapar-detail/:businessid/:businessaparid",GetBusinessApArDetail);
+router.post("/api/businessapar-detail/:businessaparid",AddBusinessApArDetail);
 
 export default router;

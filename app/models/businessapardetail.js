@@ -28,7 +28,10 @@ const BusinessApArDetail = db.define("BusinessApArDetail",{
   FlagApArIn:{ 
     type:DataTypes.INTEGER, //0 = keluar, 1 = masuk
     defaultValue:0,
-    allowNull:false
+    allowNull:false,
+    validate:{
+      isIn:[[0,1]]
+    }
   },
   CreatedBy:{ 
     type:DataTypes.STRING

@@ -1,5 +1,9 @@
 import Transactions from "../models/transactions.js";
 import TransactionDetail from "../models/transactiondetail.js";
+import BusinessApAr from "../models/businessapar.js";
+import BusinessApArDetail from "../models/businessapardetail.js";
+import { CreateApAr } from "./businessapar.js";
+import { CreateApArDetail } from "./businessapardetail.js";
 import Sequelize from "sequelize";
 import database from "../config/connectionDatabase.js";
 import date from "date-and-time";
@@ -112,6 +116,7 @@ export const AddTransaction = async (req, res) => {
     status,
     amountin,
     amountout,
+    personid,
     description,
     paymenttype,
     productid,
@@ -122,9 +127,18 @@ export const AddTransaction = async (req, res) => {
 
   try {
     if (flagtransactiontype === 1 && amountin !== null) {
-      return res.status(400).send({
-        message: "TransactionType Outcome not allowed input Amount Income",
-      });
+      return (
+        t.rollback(),
+        res.status(400).send({
+          message: "TransactionType Outcome not allowed input Amount Income",
+        })
+      );
+    }
+    if (status == 0 && personid == null) {
+      return (
+        t.rollback(),
+        res.status(400).send({ message: "Person must filled, in Debt status" })
+      );
     }
 
     let transactiondt = [];
@@ -137,6 +151,7 @@ export const AddTransaction = async (req, res) => {
         FlagStatus: status,
         AmountIn: amountin,
         AmountOut: amountout,
+        PersonId: personid,
         Description: description,
         PaymentType: paymenttype,
         BusinessId: businessid,
@@ -199,7 +214,9 @@ export const AddTransaction = async (req, res) => {
       )
         .then(() => {
           return (
-            t.commit(), res.status(200).json({ message: "Transaction Created" })
+            AutoCreatedApAr(),
+            t.commit(),
+            res.status(200).json({ message: "Transaction Created" })
           );
         })
         .catch((error) => {
@@ -228,6 +245,7 @@ export const AddTransaction = async (req, res) => {
         )
           .then(() => {
             return (
+              AutoCreatedApAr(),
               t.commit(),
               res.status(200).json({ message: "Transaction Created" })
             );
@@ -239,6 +257,41 @@ export const AddTransaction = async (req, res) => {
           });
       });
     }
+
+    const AutoCreatedApAr = async () => {
+      //check FlagStatus
+      if (status == 0) {
+        BusinessApAr.findOne({
+          attributes: ["Id"],
+          where: { PersonId: { [Op.eq]: personid } },
+        }).then((findPersonApAr) => {
+          let SetApArAmount =
+            flagtransactiontype === "0" ? amountin : amountout;
+          let SetFlagApArIn = flagtransactiontype === "0" ? 0 : 1;
+          if (!findPersonApAr) {
+            CreateApAr(
+              personid,
+              businessid,
+              userid,
+              transactiondate,
+              SetApArAmount,
+              description,
+              SetFlagApArIn
+            );
+          } else {
+            CreateApArDetail(
+              findPersonApAr.Id,
+              transactiondate,
+              SetApArAmount,
+              description,
+              SetFlagApArIn
+            );
+          }
+        });
+      } else {
+        return;
+      }
+    };
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
