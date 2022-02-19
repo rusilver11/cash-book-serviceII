@@ -16,9 +16,12 @@ const Products = db.define(
       type: DataTypes.STRING,
     },
     FlagTransactionType: {
-      type: DataTypes.INTEGER, //0 = pemasukan, 1 = pengeluaran, 2 = semua
+      type: DataTypes.INTEGER, //0 = pemasukan, 1 = pengeluaran
       defaultValue: 0,
-      allowNull:false
+      allowNull:false,
+      validate:{
+        isIn:[[0,1]],
+      }
     },
     ProductCategoryId: {
       type: DataTypes.INTEGER,

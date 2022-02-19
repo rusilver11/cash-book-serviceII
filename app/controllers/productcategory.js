@@ -58,7 +58,7 @@ export const GetAllProductsGroupByCategory = async (req, res) => {
         },
         where: {
           BusinessId: { [Op.eq]: businessid },
-          "$ProductProductCategory.FlagTransactionType$": {[Op.or]: [transactiontypeid,2]}
+          "$ProductProductCategory.FlagTransactionType$": {[Op.eq]: [transactiontypeid]}
         },
         order: [["Name", "ASC"]],
       });
@@ -115,7 +115,7 @@ export const EditProductCategory = async (req, res) => {
     );
     return (
       await t.commit(),
-      res.status(200).json({ message: `Product category ${name} updated` })
+      res.status(204).json({ message: "updated successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
@@ -172,7 +172,7 @@ export const DeleteProductCategory = async (req, res) => {
       { transaction: t }
     );
     return (
-      await t.commit(), res.status(200).json({ message: "Product category deleted" })
+      await t.commit(), res.status(204).json({ message: "deleted successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });

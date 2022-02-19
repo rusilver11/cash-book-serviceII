@@ -84,7 +84,7 @@ export const EditBusinesses = async (req, res) => {
       },
       { transaction: t }
     );
-    return await t.commit(), res.status(200).json({message:`Business ${name} updated`});
+    return await t.commit(), res.status(204).json({message: "updated successfully"});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
@@ -158,7 +158,7 @@ export const DeleteBusinesses = async (req, res) => {
         }
       );
       
-    return await t.commit(), res.status(200).json({message:"Business deleted"});
+    return await t.commit(), res.status(204).json({message:"deleted successfully"});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }

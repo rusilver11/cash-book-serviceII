@@ -23,7 +23,7 @@ export const getUsers = async (req, res) => {
 
 export const Login = async (req, res, next) => {
   const { phone } = req.body;
-
+//validate register whatsapp
   const checkRegisteredNumber = async function (number) {
     const isRegistered = await WAClient.isRegisteredUser(number);
     return isRegistered;
@@ -33,10 +33,7 @@ export const Login = async (req, res, next) => {
   const isRegisterdNumber = await checkRegisteredNumber(formatnumber);
 
   if (!isRegisterdNumber) {
-    return res.status(404).send({
-      status: false,
-      message: "the number is not registered",
-    });
+    return res.status(404).send({message: "the number is not registered on WhatsApp"});
   }
   let today = new Date();
   let exptoday = date.addMinutes(today, 5);
@@ -57,7 +54,7 @@ export const Login = async (req, res, next) => {
       //create user
       const CreateUser = await Users.create(
         {
-          Name: "Juragan",
+          Name: "Juragan", //default
           Phone: phone,
           OTP: otpgenerate(5),
           OTPExpired: exptoday,
@@ -105,25 +102,16 @@ export const Login = async (req, res, next) => {
         { transaction: t }
       );
     }
-    await t.commit();
     //return json availableuser and send otp
     return (
-      res.status(200).send({
-        status: true,
-        message: "Register Sucessed",
-        response: availableuser,
-      }),
-      next()
-    );
+      await t.commit(),
+      res.status(200).send({ message: "Register Sucessed",response: availableuser,})
+      ,next() );
   } catch (error) {
     console.error(error);
     return (
       await t.rollback(),
-      res.status(400).send({
-        status: false,
-        message: "Register Failed",
-        response: error.message,
-      })
+      res.status(400).send({message: "Register Failed",response: error.message})
     );
   }
 };
@@ -187,7 +175,7 @@ export const VerifyOTP = async (req, res) => {
       maxAge: 86400000, //24h
     });
     console.log("OTP Valid");
-    return await t.commit(), res.status(200).json({ accessToken });
+    return await t.commit(), res.status(204).json({ accessToken });
   } catch (error) {
     console.error(error);
     return await t.rollback(), res.status(400).send({ response: error.message });
@@ -227,11 +215,10 @@ export const Logout = async (req, res) => {
         },
       }
     );
-    t.commit();
     res.clearCookie("refreshToken");
-    return res.sendStatus(200);
+    return await t.commit(),res.sendStatus(204);
   } catch (error) {
-    t.rollback();
+    await t.rollback();
     return res.status(400).send({ message: error });
   }
 };

@@ -216,7 +216,7 @@ export const AddTransaction = async (req, res) => {
           return (
             AutoCreatedApAr(),
             t.commit(),
-            res.status(200).json({ message: "Transaction Created" })
+            res.status(204).json({ message: "created successfully" })
           );
         })
         .catch((error) => {
@@ -247,7 +247,7 @@ export const AddTransaction = async (req, res) => {
             return (
               AutoCreatedApAr(),
               t.commit(),
-              res.status(200).json({ message: "Transaction Created" })
+              res.status(204).json({ message: "created successfully" })
             );
           })
           .catch((error) => {
@@ -265,8 +265,7 @@ export const AddTransaction = async (req, res) => {
           attributes: ["Id"],
           where: { PersonId: { [Op.eq]: personid } },
         }).then((findPersonApAr) => {
-          let SetApArAmount =
-            flagtransactiontype === "0" ? amountin : amountout;
+          let SetApArAmount = flagtransactiontype === "0" ? amountin : amountout;
           let SetFlagApArIn = flagtransactiontype === "0" ? 0 : 1;
           if (!findPersonApAr) {
             CreateApAr(
@@ -292,6 +291,7 @@ export const AddTransaction = async (req, res) => {
         return;
       }
     };
+
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
@@ -326,7 +326,7 @@ export const EditTransaction = async (req, res) => {
       { transaction: t }
     );
     return (
-      await t.commit(), res.status(200).json({ message: "Transaction Updated" })
+      await t.commit(), res.status(204).json({ message: "Updated successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });
@@ -357,7 +357,7 @@ export const DeleteTransaction = async (req, res) => {
     );
     //pr: AP AR update set to lunas
     return (
-      await t.commit(), res.status(200).json({ message: "Transaction Deleted" })
+      await t.commit(), res.status(204).json({ message: "deleted successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });

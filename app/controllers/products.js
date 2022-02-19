@@ -1,4 +1,3 @@
-import ProductCategory from "../models/productcategory.js";
 import Products from "../models/products.js";
 import TransactionDetail from "../models/transactiondetail.js";
 import Sequelize from "sequelize";
@@ -17,7 +16,7 @@ export const GetAllProducts = async (req, res) => {
       attributes: ["Id", "Name", "EstimatePrice", "ProductCategoryId"],
       where: {
         BusinessId: { [Op.eq]: businessid },
-        FlagTransactionType: { [Op.or]: [transactiontype, 2] },
+        FlagTransactionType: { [Op.or]: [transactiontype] },
       },
       order: [["Name", "ASC"]],
     });
@@ -42,7 +41,7 @@ export const GetProduct = async (req, res) => {
       where: {
         Id: { [Op.eq]: productid },
         BusinessId: { [Op.eq]: businessid },
-        TransactionType: { [Op.or]: [transactiontype, 2] },
+        TransactionType: { [Op.eq]: [transactiontype] },
       }
     });
     return res.status(200).json(products);
@@ -118,7 +117,7 @@ export const EditProduct = async (req, res) => {
     );
     return (
       await t.commit(),
-      res.status(200).json({ message: `Product ${name} updated` })
+      res.status(204).json({ message: "updated successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
@@ -152,12 +151,12 @@ export const DeleteProduct = async (req, res) => {
         { transaction: t }
       );
       return (
-        await t.commit(), res.status(200).json({ message: "Product deleted" })
+        await t.commit(), res.status(204).json({ message: "deleted successfully" })
       );
     } else {
       return (
         t.rollback,
-        res.status(200).json({
+        res.status(409).json({
           message:
             "Product tidak dapat dihapus karena telah terpkai di transaksi",
           result: checkproductuses,
