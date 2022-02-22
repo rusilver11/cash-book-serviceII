@@ -84,15 +84,14 @@ export const GetBusinessApArDetail = async (req, res) => {
 
 export const AddBusinessApArDetail = async (req, res) => {
   const businessaparid = req.params.businessaparid;
-  const { apardate, amount, description, flagaparin, createdby } = req.body;
+  const { apardate, amount, description, flagaparin } = req.body;
   try {
     await CreateApArDetail(
       businessaparid,
       apardate,
       amount,
       description,
-      flagaparin,
-      createdby
+      flagaparin
     );
     return res.status(200).json({ message: "Ap or Ar Detail Created!" });
   } catch (error) {
@@ -105,8 +104,7 @@ export const CreateApArDetail = async (
   apardate,
   amount,
   description,
-  flagaparin,
-  createdby
+  flagaparin
 ) => {
   const t = await database.transaction();
   try {
@@ -119,9 +117,9 @@ export const CreateApArDetail = async (
       return (
         t.rollback(),
         res
-          .status(400)
+          .status(404)
           .json({
-            message: "Header doesn't exist, please create header first!",
+            message: "AP or AR Header doesn't exist, please create header first!",
           })
       );
     }
@@ -132,7 +130,6 @@ export const CreateApArDetail = async (
         Amount: amount,
         Description: description,
         FlagApArIn: flagaparin,
-        CreatedBy: createdby,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },

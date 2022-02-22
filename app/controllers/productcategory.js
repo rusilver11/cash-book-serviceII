@@ -70,13 +70,13 @@ export const GetAllProductsGroupByCategory = async (req, res) => {
   };
 
 export const AddProductCategory = async (req, res) => {
-  const { businessid, userid, name } = req.body;
+  const businessid = req.params.businessid
+  const { name } = req.body;
   const t = await database.transaction();
   try {
     const createProductcategory = await ProductCategory.create(
       {
         BusinessId: businessid,
-        CreatedBy: userid,
         Name: name,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),

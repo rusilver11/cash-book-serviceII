@@ -23,10 +23,6 @@ const BusinessApAr = db.define(
     BusinessId:{ 
       type: DataTypes.UUID 
     },
-    CreatedBy: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUID4,
-    },
     CreatedAt:{ 
       type:DataTypes.DATE,
       defaultValue:DataTypes.NOW

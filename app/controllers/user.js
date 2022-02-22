@@ -134,28 +134,24 @@ export const VerifyOTP = async (req, res) => {
     );
 
     if (!checkUser){
-      return (
-        t.rollback(),
-        res.status(400).send({ response: "OTP invalid" })
-      );
+      return res.status(400).send({ response: "OTP invalid" })
     }else if(date.format(checkUser.OTPExpired, "YYYY/MM/DD HH:mm:ss Z") < formattoday){
-      return (
-        t.rollback(),
-        res.status(400).send({ response: "OTP Expired" })
-      );
+      return res.status(400).send({ response: "OTP Expired" })
     }
+
     //create token
     const UserId = checkUser.Id;
     const Phone = checkUser.Phone;
+    const Otp = checkUser.OTP;
     const accessToken = jwt.sign(
-      { UserId, Phone },
+      { UserId, Phone, Otp },
       `${process.env.ACCESS_TOKEN_SECRET}`,
       {
-        expiresIn: "60s",
+        expiresIn: "1h",
       }
     );
     const refreshToken = jwt.sign(
-      { UserId, Phone },
+      { UserId, Phone, Otp },
       `${process.env.REFRESH_TOKEN_SECRET}`,
       {
         expiresIn: "1d",
@@ -174,10 +170,8 @@ export const VerifyOTP = async (req, res) => {
       httpOnly: true,
       maxAge: 86400000, //24h
     });
-    console.log("OTP Valid");
-    return await t.commit(), res.status(204).json({ accessToken });
+    return await t.commit(), res.status(200).json({ accessToken });
   } catch (error) {
-    console.error(error);
     return await t.rollback(), res.status(400).send({ response: error.message });
   }
 };
@@ -185,11 +179,13 @@ export const VerifyOTP = async (req, res) => {
 export const Logout = async (req, res) => {
   try {
     const refresToken = req.body.token;
+    const userid = req.params.userid;
     if (!refresToken) return res.sendStatus(433);
     const t = await database.transaction();
     const User = await Users.findOne(
       {
         where: {
+          Id: { [Op.eq]: userid},
           RefreshToken: { [Op.eq]: refresToken },
         },
       },

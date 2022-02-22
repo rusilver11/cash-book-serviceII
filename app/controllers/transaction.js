@@ -108,9 +108,8 @@ export const GetTransaction = async (req, res) => {
 };
 
 export const AddTransaction = async (req, res) => {
+  const Businessid = req.params.businessid;
   const {
-    businessid,
-    userid,
     transactiondate,
     flagtransactiontype,
     status,
@@ -154,8 +153,7 @@ export const AddTransaction = async (req, res) => {
         PersonId: personid,
         Description: description,
         PaymentType: paymenttype,
-        BusinessId: businessid,
-        CreatedBy: userid,
+        BusinessId: Businessid,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },
@@ -168,7 +166,6 @@ export const AddTransaction = async (req, res) => {
           "Description",
           "PaymentType",
           "BusinessId",
-          "CreatedBy",
           "CreatedAt",
           "UpdatedAt",
         ],
@@ -270,8 +267,7 @@ export const AddTransaction = async (req, res) => {
           if (!findPersonApAr) {
             CreateApAr(
               personid,
-              businessid,
-              userid,
+              Businessid,
               transactiondate,
               SetApArAmount,
               description,

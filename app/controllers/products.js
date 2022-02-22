@@ -52,9 +52,8 @@ export const GetProduct = async (req, res) => {
 };
 
 export const AddProduct = async (req, res) => {
+  const BusinessId = req.params.businessid
   const {
-    businessid,
-    userid,
     name,
     estprice,
     productcategoryid,
@@ -64,12 +63,11 @@ export const AddProduct = async (req, res) => {
   try {
     const createProduct = await Products.create(
       {
-        BusinessId: businessid,
+        BusinessId: BusinessId,
         Name: name,
         EstimatePrice: estprice,
         ProductCategoryId: productcategoryid,
         TransactionType: transactiontype,
-        CreatedBy: userid,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },

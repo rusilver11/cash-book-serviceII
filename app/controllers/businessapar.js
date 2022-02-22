@@ -16,7 +16,6 @@ BusinessApAr.hasMany(BusinessApArDetail, {
 
 export const GetBusinessApAr = async (req, res) => {
   const businessid = req.params.businessid;
-  //const userid = req.params.userid;
   try {
     const findPersonApAr = await BusinessApAr.findAll({
       attributes: [
@@ -41,7 +40,6 @@ export const GetBusinessApAr = async (req, res) => {
               "Amount",
               "Description",
               "FlagApArIn",
-              "CreatedBy",
               "CreatedAt",
               "UpdatedAt",
             ],
@@ -59,7 +57,6 @@ export const GetBusinessApAr = async (req, res) => {
               "Amount",
               "Description",
               "FlagApArIn",
-              "CreatedBy",
               "CreatedAt",
               "UpdatedAt",
             ],
@@ -88,11 +85,10 @@ export const GetBusinessApAr = async (req, res) => {
 };
 
 export const AddBusinessApAr = async (req, res) => {
+  const BusinessId = req.params.businessid
   const {
     //header
     personid,
-    businessid,
-    userid,
     //detail
     apardate,
     amount,
@@ -102,8 +98,7 @@ export const AddBusinessApAr = async (req, res) => {
   try {
     await CreateApAr(
       personid,
-      businessid,
-      userid,
+      BusinessId,
       apardate,
       amount,
       description,
@@ -119,7 +114,6 @@ export const CreateApAr = async (
   //header
   personid,
   businessid,
-  userid,
   //detail
   apardate,
   amount,
@@ -132,7 +126,6 @@ export const CreateApAr = async (
       {
         PersonId: personid,
         BusinessId: businessid,
-        CreatedBy: userid,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },
@@ -140,7 +133,6 @@ export const CreateApAr = async (
         fields: [
           "PersonId",
           "BusinessId",
-          "CreatedBy",
           "CreatedAt",
           "UpdatedAt",
         ],
@@ -154,7 +146,6 @@ export const CreateApAr = async (
         Amount: amount,
         Description: description,
         FlagApArIn: flagaparin,
-        CreatedBy: userid,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },
@@ -165,7 +156,6 @@ export const CreateApAr = async (
           "Amount",
           "Description",
           "FlagApArIn",
-          "CreatedBy",
           "CreatedAt",
           "UpdatedAt",
         ],
@@ -179,7 +169,7 @@ export const CreateApAr = async (
 };
 
 export const EditBusinessApAr = async (req, res) => {
-  const Businessaparid = req.params.businessaparid;
+  const Businessaparid = req.params.id;
   const Businessid = req.params.businessid;
   const { duedate } = req.body;
   const t = await database.transaction();
@@ -206,7 +196,7 @@ export const EditBusinessApAr = async (req, res) => {
 };
 
 export const DeleteBusinessApAr = async (req, res) => {
-  const Businessaparid = req.params.businessaparid;
+  const Businessaparid = req.params.id;
   const Businessid = req.params.businessid;
   const t = await database.transaction();
   try {

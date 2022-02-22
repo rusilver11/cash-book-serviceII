@@ -33,9 +33,6 @@ const BusinessApArDetail = db.define("BusinessApArDetail",{
       isIn:[[0,1]]
     }
   },
-  CreatedBy:{ 
-    type:DataTypes.STRING
-  },
   CreatedAt:{ 
     type:DataTypes.DATE,
     defaultValue:DataTypes.NOW

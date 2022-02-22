@@ -45,60 +45,60 @@ import { GetBusinessApArDetail,AddBusinessApArDetail } from "../controllers/busi
 const router = express.Router();
 
 //home
-router.get("/api/version", (req, res) =>
+router.get("/version", (req, res) =>
   res.status(200).send({ message: "Service Ready" })
 );
 
 //User Router
-router.get("/api/users", VerifyToken, getUsers);
+router.get("/users", VerifyToken, getUsers);
 //sect login
-router.post("/api/login", Login, SendOTP);
-router.post("/api/login/otp", VerifyOTP);
-router.post("/api/login/resend-otp", ResendOTP);
-router.get("/api/login/token", RefreshToken);
-router.delete("/api/users/logout", Logout);
+router.post("/auth/login", Login, SendOTP);
+router.post("/auth/login/otp", VerifyOTP);
+router.post("/auth/login/resend-otp", ResendOTP);
+router.get("/auth/token", RefreshToken);
+router.delete("/auth/logout/:userid", Logout);
 //sect business category
-router.get("/api/users/businesses/business-categories", GetAllBusinesscategory);
+router.get("/users/businesses/business-categories", VerifyToken, GetAllBusinesscategory);
 //sect businesses
-router.get("/api/users/businesses/:id", GetBusinesses);
-router.get("/api/users/:userid/businesses", GetAllBusinesses);
-router.post("/api/users/businesses", AddBusinesses);
-router.patch("/api/users/businesses/:id", EditBusinesses);
-router.delete("/api/users/businesses/:id", DeleteBusinesses);
+router.get("/users/businesses/:id", VerifyToken, GetBusinesses);
+router.get("/users/:userid/businesses", VerifyToken, GetAllBusinesses);
+router.post("/users/businesses", VerifyToken, AddBusinesses);
+router.patch("/users/businesses/:id", VerifyToken, EditBusinesses);
+router.delete("/users/businesses/:id", VerifyToken, DeleteBusinesses);
 //sect product category
-router.get("/api/businesses/:businessid/product-categories", GetAllProductcategory);
-router.get("/api/businesses/:businessid/product-categories/:id", GetProductcategory);
-router.get("/api/businesses/:businessid/product-categories/products/:typeid", GetAllProductsGroupByCategory);
-router.post("/api/businesses/product-categories", AddProductCategory);
-router.patch("/api/businesses/:businessid/product-categories/:id", EditProductCategory);
-router.delete("/api/businesses/:businessid/product-categories/:id", DeleteProductCategory);
+router.get("/businesses/:businessid/product-categories", VerifyToken, GetAllProductcategory);
+router.get("/businesses/:businessid/product-categories/:id", VerifyToken, GetProductcategory);
+router.get("/businesses/:businessid/product-categories/products/:typeid", VerifyToken, GetAllProductsGroupByCategory);
+router.post("/businesses/:businessid/product-categories", VerifyToken, AddProductCategory);
+router.patch("/businesses/:businessid/product-categories/:id", VerifyToken, EditProductCategory);
+router.delete("/businesses/:businessid/product-categories/:id", VerifyToken, DeleteProductCategory);
 //sect product
-router.get("/api/businesses/:businessid/products/:typeid", GetAllProducts);
-router.get("/api/businesses/:businessid/products/:typeid/:id", GetProduct);
-router.post("/api/businesses/products", AddProduct);
-router.patch("/api/businesses/:businessid/products/:id", EditProduct);
-router.delete("/api/businesses/:businessid/products/:id", DeleteProduct);
+router.get("/businesses/:businessid/products/:typeid", VerifyToken, GetAllProducts);
+router.get("/businesses/:businessid/products/:typeid/:id", VerifyToken, GetProduct);
+router.post("/businesses/:businessid/products", VerifyToken, AddProduct);
+router.patch("/businesses/:businessid/products/:id", VerifyToken, EditProduct);
+router.delete("/businesses/:businessid/products/:id", VerifyToken, DeleteProduct);
 //sect persons
-router.get("/api/users/:userid/persons", GetAllContact);
-router.post("/api/users/persons", AddContact);
+router.get("/users/:userid/persons", VerifyToken, GetAllContact);
+router.post("/users/persons", VerifyToken, AddContact);
 //sect Transactions
-router.get("/api/businesses/:businessid/transactions/:startdate/:enddate", GetTransactionByDate);
-router.get("/api/businesses/:businessid/transactions/:id", GetTransaction);
-router.post("/api/businesses/transactions", AddTransaction);
-router.patch("/api/businesses/:businessid/transactions/:id", EditTransaction);
-router.delete("/api/businesses/:businessid/transactions/:id", DeleteTransaction);
+router.get("/businesses/:businessid/transactions/:startdate/:enddate", VerifyToken, GetTransactionByDate);
+router.get("/businesses/:businessid/transactions/:id", VerifyToken, GetTransaction);
+router.post("/businesses/:businessid/transactions", VerifyToken, AddTransaction);
+router.patch("/businesses/:businessid/transactions/:id", VerifyToken, EditTransaction);
+router.delete("/businesses/:businessid/transactions/:id", VerifyToken, DeleteTransaction);
 //sect TransactionDetail
-router.get("/api/businesses/:businessid/transactions/:transactionid/detail/:typeid",GetTransactionDetail);
-router.post("/api/businesses/transactions/:transactionid/detail", AddTransactionDetail);
-router.patch("/api/businesses/transactions/:transactionid/detail", EditTransactionDetail);
-router.delete("/api/businesses/transactions/:transactionid/detail",DeleteTransactionDetail);
+router.get("/businesses/:businessid/transactions/:transactionid/detail/:typeid", VerifyToken, GetTransactionDetail);
+router.post("/businesses/transactions/:transactionid/detail", VerifyToken, AddTransactionDetail);
+router.patch("/businesses/transactions/:transactionid/detail", VerifyToken, EditTransactionDetail);
+router.delete("/businesses/transactions/:transactionid/detail", VerifyToken, DeleteTransactionDetail);
 //sect BusinessApAr
-router.get("/api/businesses/:businessid/businessapar",GetBusinessApAr);
-router.post("/api/businesses/businessapar", AddBusinessApAr);
-router.patch("/api/businesses/:businessid/businessapar/:businessaparid", EditBusinessApAr);
-router.delete("/api/businesses/:businessid/businessapar/:businessaparid", DeleteBusinessApAr);
+router.get("/businesses/:businessid/businessapar", VerifyToken, GetBusinessApAr);
+router.post("/businesses/:businessid/businessapar", VerifyToken, AddBusinessApAr);
+router.patch("/businesses/:businessid/businessapar/:id", VerifyToken, EditBusinessApAr);
+router.delete("/businesses/:businessid/businessapar/:id", VerifyToken, DeleteBusinessApAr);
 //sect BusinessApArDetail
-router.get("/api/businesses/:businessid/businessapar/:businessaparid/detail",GetBusinessApArDetail);
-router.post("/api/businesses/businessapar/:businessaparid/detail",AddBusinessApArDetail);
+router.get("/businesses/:businessid/businessapar/:businessaparid/detail", VerifyToken, GetBusinessApArDetail);
+router.post("/businesses/businessapar/:businessaparid/detail", VerifyToken, AddBusinessApArDetail);
 
 export default router;

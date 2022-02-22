@@ -34,9 +34,6 @@ const Products = db.define(
       type: DataTypes.UUID,
       allowNull:false
     },
-    CreatedBy: {
-      type: DataTypes.STRING,
-    },
     CreatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
