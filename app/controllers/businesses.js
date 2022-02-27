@@ -6,11 +6,11 @@ const Op = Sequelize.Op;
 
 export const GetAllBusinesses = async (req, res) => {
   try {
-    const userid = req.params.id;
+    const UserId = req.params.userid;
     const findBusinesses = await Businesses.findAll({
       attributes: ["Id", "Name"],
       where: {
-        UserId: { [Op.eq]: userid },
+        UserId: { [Op.eq]: UserId },
       },
       order:[["CreatedAt","ASC"]]
     });
@@ -44,12 +44,13 @@ export const GetBusinesses = async (req, res) => {
 };
 
 export const AddBusinesses = async (req, res) => {
-  const { userid, category, name } = req.body;
+  const UserId = req.params.userid
+  const {category, name } = req.body;
   const t = await database.transaction();
   try {
     const createBusinesses = await Businesses.create(
       {
-        UserId: userid,
+        UserId: UserId,
         BusinessCategoryId: category,
         Name: name,
         CreatedAt: Date.now(),
@@ -60,7 +61,7 @@ export const AddBusinesses = async (req, res) => {
       },
       { transaction: t }
     );
-    return await t.commit(), res.status(200).json({result:createBusinesses});
+    return await t.commit(), res.status(201).json({result:createBusinesses});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }

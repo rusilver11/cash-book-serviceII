@@ -104,7 +104,7 @@ export const AddBusinessApAr = async (req, res) => {
       description,
       flagaparin
     );
-    return res.status(200).json({ message: "Business AP or AR created" });
+    return res.status(201).json({ message: "Business AP or AR created" });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

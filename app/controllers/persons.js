@@ -6,11 +6,11 @@ const Op = Sequelize.Op;
 
 export const GetAllContact = async (req, res) => {
   try {
-    const userid = req.params.userid;
+    const UserId = req.params.userid;
     const FindPersons = await Persons.findAll({
       attributes: ["Id", "ContactId"],
       where: {
-        UserId: { [Op.eq]: userid },
+        UserId: { [Op.eq]: UserId },
       },
     });
     return res.status(200).json(FindPersons);
@@ -20,7 +20,8 @@ export const GetAllContact = async (req, res) => {
 };
 
 export const AddContact = async (req, res) => {
-  const { userid, contactid } = req.body;
+  const userid = req.params.userid
+  const {contactid } = req.body;
   const t = await database.transaction();
   try {
     const createperson = await Persons.create(
@@ -35,7 +36,7 @@ export const AddContact = async (req, res) => {
       },
       { transaction: t }
     );
-    return t.commit(), res.status(200).json({ result: createperson });
+    return t.commit(), res.status(201).json({ result: createperson });
   } catch (error) {
     return t.rollback(), res.status(400).send({ message: error.message });
   }

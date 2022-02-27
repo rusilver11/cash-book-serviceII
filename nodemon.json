@@ -1,3 +1,3 @@
 {
-	"ignore": ["wasession*.json", "wasessions.json"]
+	"ignore": ["wasession*.json", "wasessions.json", "test/**/*.js"]
 }

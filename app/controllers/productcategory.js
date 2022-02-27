@@ -13,11 +13,11 @@ ProductCategory.hasMany(Products, {
 
 export const GetAllProductcategory = async (req, res) => {
   try {
-    const businessid = req.params.id;
+    const BusinessId = req.params.businessid;
     const Productcategory = await ProductCategory.findAll({
       attributes: ["Id", "Name"],
       where: {
-        BusinessId: { [Op.eq]: businessid },
+        BusinessId: { [Op.eq]: BusinessId },
       },
       order: [["Name", "ASC"]],
     });
@@ -87,7 +87,7 @@ export const AddProductCategory = async (req, res) => {
       { transaction: t }
     );
     return (
-      await t.commit(), res.status(200).json({ result: createProductcategory })
+      await t.commit(), res.status(201).json({ result: createProductcategory })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });

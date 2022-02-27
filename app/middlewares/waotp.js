@@ -46,7 +46,7 @@ export const ResendOTP = async (req, res) => {
       },
       { transaction: t }
     );
-    if(!findUser) return t.rollback(), res.status(400).send({message:"User doesn't exist cannot resend OTP"})
+    if(!findUser) return t.rollback(), res.status(404).send({message:"User doesn't exist cannot resend OTP"})
     await Users.update(
       {
         OTP: otpnumber,

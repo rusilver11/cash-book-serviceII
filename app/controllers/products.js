@@ -85,7 +85,7 @@ export const AddProduct = async (req, res) => {
       },
       { transaction: t }
     );
-    return await t.commit(), res.status(200).json({ result: createProduct });
+    return await t.commit(), res.status(201).json({ result: createProduct });
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }

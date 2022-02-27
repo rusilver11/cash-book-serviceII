@@ -55,14 +55,14 @@ router.get("/users", VerifyToken, getUsers);
 router.post("/auth/login", Login, SendOTP);
 router.post("/auth/login/otp", VerifyOTP);
 router.post("/auth/login/resend-otp", ResendOTP);
-router.get("/auth/token", RefreshToken);
+router.post("/auth/token", RefreshToken);
 router.delete("/auth/logout/:userid", Logout);
 //sect business category
 router.get("/users/businesses/business-categories", VerifyToken, GetAllBusinesscategory);
 //sect businesses
 router.get("/users/businesses/:id", VerifyToken, GetBusinesses);
 router.get("/users/:userid/businesses", VerifyToken, GetAllBusinesses);
-router.post("/users/businesses", VerifyToken, AddBusinesses);
+router.post("/users/:userid/businesses", VerifyToken, AddBusinesses);
 router.patch("/users/businesses/:id", VerifyToken, EditBusinesses);
 router.delete("/users/businesses/:id", VerifyToken, DeleteBusinesses);
 //sect product category
@@ -80,7 +80,7 @@ router.patch("/businesses/:businessid/products/:id", VerifyToken, EditProduct);
 router.delete("/businesses/:businessid/products/:id", VerifyToken, DeleteProduct);
 //sect persons
 router.get("/users/:userid/persons", VerifyToken, GetAllContact);
-router.post("/users/persons", VerifyToken, AddContact);
+router.post("/users/:userid/persons", VerifyToken, AddContact);
 //sect Transactions
 router.get("/businesses/:businessid/transactions/:startdate/:enddate", VerifyToken, GetTransactionByDate);
 router.get("/businesses/:businessid/transactions/:id", VerifyToken, GetTransaction);

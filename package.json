@@ -7,7 +7,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "test": "mocha test/**/**/*.js --exit --grep"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -23,9 +24,13 @@
     "qrcode-terminal": "^0.12.0",
     "sequelize": "^6.9.0",
     "sequelize-cli": "^6.3.0",
-    "whatsapp-web.js": "^1.15.3"
+    "whatsapp-web.js": "^1.15.8"
   },
   "devDependencies": {
-    "nodemon": "^2.0.14"
+    "chai": "^4.3.6",
+    "chai-http": "^4.3.0",
+    "mocha": "^9.2.1",
+    "nodemon": "^2.0.14",
+    "supertest": "^6.2.2"
   }
 }

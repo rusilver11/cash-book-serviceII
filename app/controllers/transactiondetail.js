@@ -91,7 +91,7 @@ export const AddTransactionDetail = async (req, res) => {
     }
     return (
       await t.commit(),
-      res.status(200).json({ message: "Transaction detail Created" })
+      res.status(201).json({ message: "Transaction detail Created" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });

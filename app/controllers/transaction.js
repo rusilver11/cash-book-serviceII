@@ -213,7 +213,7 @@ export const AddTransaction = async (req, res) => {
           return (
             AutoCreatedApAr(),
             t.commit(),
-            res.status(204).json({ message: "created successfully" })
+            res.status(201).json({ message: "created successfully" })
           );
         })
         .catch((error) => {
@@ -244,7 +244,7 @@ export const AddTransaction = async (req, res) => {
             return (
               AutoCreatedApAr(),
               t.commit(),
-              res.status(204).json({ message: "created successfully" })
+              res.status(201).json({ message: "created successfully" })
             );
           })
           .catch((error) => {

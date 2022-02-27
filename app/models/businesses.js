@@ -17,7 +17,6 @@ const Businesses = db.define("Businesses",{
     Name:{
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "Bisnis Agan"
     },
     BusinessCategoryId:{
       type: DataTypes.INTEGER,

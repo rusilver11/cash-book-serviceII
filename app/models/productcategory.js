@@ -14,6 +14,7 @@ const ProductCategory = db.define(
     },
     Name: {
       type: DataTypes.STRING,
+      allowNull:false
     },
     BusinessId: {
       type: DataTypes.UUID,

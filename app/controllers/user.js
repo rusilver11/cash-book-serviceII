@@ -49,10 +49,13 @@ export const Login = async (req, res, next) => {
       },
       { transaction: t }
     );
-
+    //check user if user already exist just update data 
+    //and if user not exist create new user data
+    let CreateUser;
+    let UpdateUser;
     if (!availableuser) {
       //create user
-      const CreateUser = await Users.create(
+       CreateUser = await Users.create(
         {
           Name: "Juragan", //default
           Phone: phone,
@@ -77,7 +80,7 @@ export const Login = async (req, res, next) => {
       await Businesses.create(
         {
           UserId: CreateUser.Id,
-          CreatedBy: phone,
+          Name: "Usaha Juragan",
           CreatedAt: Date.now(),
           UpdatedAt: Date.now(),
         },
@@ -88,7 +91,7 @@ export const Login = async (req, res, next) => {
       );
     } else {
       //update otp and otp expired
-      await Users.update(
+       UpdateUser = await Users.update(
         {
           OTP: otpgenerate(5),
           OTPExpired: exptoday,
@@ -102,16 +105,15 @@ export const Login = async (req, res, next) => {
         { transaction: t }
       );
     }
-    //return json availableuser and send otp
     return (
       await t.commit(),
-      res.status(200).send({ message: "Register Sucessed",response: availableuser,})
+      res.status(201).send({ message: "OTP has send please verify your OTP"})
       ,next() );
   } catch (error) {
     console.error(error);
     return (
       await t.rollback(),
-      res.status(400).send({message: "Register Failed",response: error.message})
+      res.status(400).send({message: "Failed to send OTP",response: error.message})
     );
   }
 };
@@ -170,7 +172,9 @@ export const VerifyOTP = async (req, res) => {
       httpOnly: true,
       maxAge: 86400000, //24h
     });
-    return await t.commit(), res.status(200).json({ accessToken });
+    return await t.commit(), res.status(200).json({ message: "Verification success" ,
+    token: accessToken,
+  refreshToken: refreshToken });
   } catch (error) {
     return await t.rollback(), res.status(400).send({ response: error.message });
   }

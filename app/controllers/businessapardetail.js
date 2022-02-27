@@ -93,7 +93,7 @@ export const AddBusinessApArDetail = async (req, res) => {
       description,
       flagaparin
     );
-    return res.status(200).json({ message: "Ap or Ar Detail Created!" });
+    return res.status(201).json({ message: "Ap or Ar Detail Created" });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
