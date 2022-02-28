@@ -7,6 +7,7 @@ import WAClient from "../../server.js";
 import PhoneFormat from "../library/phoneformat.js";
 import otpgenerate from "../library/numbergenerate.js";
 import date from "date-and-time";
+import {CreateBusinesses} from "./businesses.js"
 const Op = Sequelize.Op;
 
 export const getUsers = async (req, res) => {
@@ -77,18 +78,19 @@ export const Login = async (req, res, next) => {
         { transaction: t }
       );
       //create business
-      await Businesses.create(
-        {
-          UserId: CreateUser.Id,
-          Name: "Usaha Juragan",
-          CreatedAt: Date.now(),
-          UpdatedAt: Date.now(),
-        },
-        {
-          fields: ["UserId", "CreatedAt", "UpdatedAt"],
-        },
-        { transaction: t }
-      );
+      await CreateBusinesses(CreateUser.Id, null, "Usahaku");
+      // await Businesses.create(
+      //   {
+      //     UserId: CreateUser.Id,
+      //     Name: "Usaha Juragan",
+      //     CreatedAt: Date.now(),
+      //     UpdatedAt: Date.now(),
+      //   },
+      //   {
+      //     fields: ["UserId", "Name", "CreatedAt", "UpdatedAt"],
+      //   },
+      //   { transaction: t }
+      // );
     } else {
       //update otp and otp expired
        UpdateUser = await Users.update(
@@ -206,8 +208,7 @@ export const Logout = async (req, res) => {
 
     await Users.update(
       {
-        RefreshToken: null,
-        StatusVerified: 0,
+        RefreshToken: null
       },
       {
         where: {

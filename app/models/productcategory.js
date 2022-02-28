@@ -20,6 +20,12 @@ const ProductCategory = db.define(
       type: DataTypes.UUID,
       allowNull:false
     },
+    FlagAuto:{
+      type: DataTypes.INTEGER,
+      validate: {
+        isIn: [[0, 1]],
+      },
+    },
     CreatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

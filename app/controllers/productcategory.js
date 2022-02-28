@@ -17,7 +17,10 @@ export const GetAllProductcategory = async (req, res) => {
     const Productcategory = await ProductCategory.findAll({
       attributes: ["Id", "Name"],
       where: {
-        BusinessId: { [Op.eq]: BusinessId },
+        [Op.or]: [
+          {BusinessId:BusinessId},
+          {BusinessId:{[Op.is]:null}}
+        ],
       },
       order: [["Name", "ASC"]],
     });
@@ -32,11 +35,11 @@ export const GetProductcategory = async (req, res) => {
   try {
     const businessid = req.params.businessid;
     const productcategoryid = req.params.id
-    const Productcategory = await ProductCategory.findAll({
+    const Productcategory = await ProductCategory.findOne({
       attributes: ["Id", "Name"],
       where: {
         Id: { [Op.eq]: productcategoryid },
-        BusinessId: { [Op.eq]: businessid },
+        BusinessId: { [Op.eq]: [businessid] },
       },
     });
     return res.status(200).json(Productcategory);
@@ -57,8 +60,8 @@ export const GetAllProductsGroupByCategory = async (req, res) => {
             attributes: ["Id", "Name", "EstimatePrice", "ProductCategoryId"]
         },
         where: {
-          BusinessId: { [Op.eq]: businessid },
-          "$ProductProductCategory.FlagTransactionType$": {[Op.eq]: [transactiontypeid]}
+          BusinessId: { [Op.or]: [businessid,{[Op.is]:null}] },
+          "$ProductProductCategory.FlagTransactionType$": {[Op.eq]: transactiontypeid}
         },
         order: [["Name", "ASC"]],
       });
@@ -78,11 +81,12 @@ export const AddProductCategory = async (req, res) => {
       {
         BusinessId: businessid,
         Name: name,
+        FlagAuto:0,
         CreatedAt: Date.now(),
         UpdatedAt: Date.now(),
       },
       {
-        fields: ["BusinessId", "CreatedBy", "Name", "CreatedAt", "UpdatedAt"],
+        fields: ["BusinessId", "Name", "FlagAuto", "CreatedAt", "UpdatedAt"],
       },
       { transaction: t }
     );
@@ -100,6 +104,19 @@ export const EditProductCategory = async (req, res) => {
   const { name } = req.body;
   const t = await database.transaction();
   try {
+
+    //check Category autocreted/FlagAuto = 1 is not allowed to deleted 
+    const CategoryFlagAuto = await ProductCategory.findOne(
+      {
+        where: {
+          BusinessId: {[Op.eq]:null},
+          Id: {[Op.eq]:productcategoryid}
+        },
+      },
+      { transaction: t }
+    );
+    if(CategoryFlagAuto.FlagAuto === 1) return (await t.rollback(), res.status(405).send({message: "AutoCreate category not allowed to deleted"}));
+
     await ProductCategory.update(
       {
         Name: name,
@@ -127,6 +144,17 @@ export const DeleteProductCategory = async (req, res) => {
   const businessid = req.params.businessid;
   const t = await database.transaction();
   try {
+     //check Category autocreted/FlagAuto = 1 is not allowed to deleted 
+    const CategoryFlagAuto = await ProductCategory.findOne(
+      {
+        where: {
+          BusinessId: {[Op.eq]:null},
+          Id: {[Op.eq]:productcategoryid}
+        },
+      },
+      { transaction: t }
+    );
+    if(CategoryFlagAuto.FlagAuto === 1) return (await t.rollback(), res.status(405).send({message: "AutoCreate category not allowed to deleted"}));
     //check category currently uses in product
     const CategoryInUse = await Products.findAll(
       {

@@ -48,24 +48,34 @@ export const AddBusinesses = async (req, res) => {
   const {category, name } = req.body;
   const t = await database.transaction();
   try {
-    const createBusinesses = await Businesses.create(
-      {
-        UserId: UserId,
-        BusinessCategoryId: category,
-        Name: name,
-        CreatedAt: Date.now(),
-        UpdatedAt: Date.now(),
-      },
-      {
-        fields: ["UserId", "BusinessCategoryId", "CreatedAt", "UpdatedAt"],
-      },
-      { transaction: t }
-    );
+    const createBusinesses = await CreateBusinesses(UserId,category,name);
     return await t.commit(), res.status(201).json({result:createBusinesses});
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
 };
+
+export const CreateBusinesses = async(userId, businesscategoryId, name) =>{
+  const t = await database.transaction();
+  try {
+    const createBusinesses = await Businesses.create(
+      {
+        UserId: userId,
+        BusinessCategoryId: businesscategoryId,
+        Name: name,
+        CreatedAt: Date.now(),
+        UpdatedAt: Date.now(),
+      },
+      {
+        fields: ["UserId", "BusinessCategoryId", "Name", "CreatedAt", "UpdatedAt"],
+      },
+      { transaction: t }
+    );
+    return await t.commit(), createBusinesses;
+  } catch (error) {
+    return await t.rollback();
+  }
+}
 
 export const EditBusinesses = async (req, res) => {
   const businessid = req.params.id;
