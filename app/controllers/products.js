@@ -16,7 +16,7 @@ export const GetAllProducts = async (req, res) => {
       attributes: ["Id", "Name", "EstimatePrice", "ProductCategoryId"],
       where: {
         BusinessId: { [Op.eq]: businessid },
-        FlagTransactionType: { [Op.or]: [transactiontype] },
+        FlagTransactionType: { [Op.eq]: transactiontype },
       },
       order: [["Name", "ASC"]],
     });
@@ -41,7 +41,7 @@ export const GetProduct = async (req, res) => {
       where: {
         Id: { [Op.eq]: productid },
         BusinessId: { [Op.eq]: businessid },
-        TransactionType: { [Op.eq]: [transactiontype] },
+        FlagTransactionType: { [Op.eq]: transactiontype },
       }
     });
     return res.status(200).json(products);
@@ -138,11 +138,11 @@ export const DeleteProduct = async (req, res) => {
         "$TransactionDetailTransaction.BusinessId$": { [Op.eq]: businessid },
       },
     });
-    if (!checkproductuses) {
+    if (checkproductuses.length === 0) {
       await Products.destroy(
         {
           where: {
-            ProductId: { [Op.eq]: productid },
+            Id: { [Op.eq]: productid },
             BusinessId: { [Op.eq]: businessid },
           },
         },

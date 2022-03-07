@@ -46,9 +46,12 @@ export const GetTransactionDetail = async (req, res) => {
         },
       },
       where: {
-        BusinessId: { [Op.eq]: Businessid },
+        [Op.or]: [
+          { BusinessId: Businessid },
+          { BusinessId: { [Op.is]: null } },
+        ],
         "$TransactionDtProduct.FlagTransactionType$": {
-          [Op.or]: [Transactiontypeid, 2],
+          [Op.eq]: Transactiontypeid,
         },
       },
       order: [["Name", "ASC"]],
@@ -103,49 +106,32 @@ export const EditTransactionDetail = async (req, res) => {
   const { Productid, Qty } = req.body;
   const t = await database.transaction();
   try {
-    if (Array.isArray(Productid)) {
-      Productid.forEach((Productidarr) => {
-        //if qty product set to zero means delete from detail transaction
-        if (Qty[i] == 0) {
-          TransactionDetail.destroy(
-            {
-              where: {
-                TransactionId: { [Op.eq]: Transactionid },
-                ProductId: { [Op.eq]: Productidarr },
-              },
+    for (let i = 0; i < Productid.length; i++) {
+      //if qty product set to zero means delete from detail transaction
+      if (Qty[i] == 0) {
+        TransactionDetail.destroy(
+          {
+            where: {
+              TransactionId: { [Op.eq]: Transactionid },
+              ProductId: { [Op.eq]: Productid[i] },
             },
-            { transaction: t }
-          );
-        } else {
-          TransactionDetail.update(
-            {
-              Qty: Qty[i],
-              UpdateAt: Date.now(),
-            },
-            {
-              where: {
-                TransactionId: { [Op.eq]: Transactionid },
-                ProductId: { [Op.eq]: Productidarr },
-              },
-            },
-            { transactionid: t }
-          );
-        }
-      });
-    } else {
-      await TransactionDetail.update(
-        {
-          Qty: Qty,
-          UpdateAt: Date.now(),
-        },
-        {
-          where: {
-            TransactionId: { [Op.eq]: Transactionid },
-            ProductId: { [Op.eq]: Productid },
           },
-        },
-        { transactionid: t }
-      );
+          { transaction: t }
+        );
+      } else {
+        TransactionDetail.update(
+          {
+            Qty: Qty[i],
+          },
+          {
+            where: {
+              TransactionId: { [Op.eq]: Transactionid },
+              ProductId: { [Op.eq]: Productid[i] },
+            },
+          },
+          { transactionid: t }
+        );
+      }
     }
     return (
       await t.commit(),
@@ -156,39 +142,138 @@ export const EditTransactionDetail = async (req, res) => {
   }
 };
 
-export const DeleteTransactionDetail = async (req, res) => {
+// export const DeleteTransactionDetail = async (req, res) => {
+//   const Transactionid = req.params.transactionid;
+//   const { Productid } = req.body;
+//   const t = await database.transaction();
+//   try {
+//     if (Array.isArray(Productid)) {
+//       Productid.forEach((productarr) => {
+//         TransactionDetail.destroy(
+//           {
+//             where: {
+//               ProductId: { [Op.eq]: productarr },
+//               TransactionId: { [Op.eq]: Transactionid },
+//             },
+//           },
+//           { transaction: t }
+//         );
+//       });
+//     } else {
+//       TransactionDetail.destroy(
+//         {
+//           where: {
+//             ProductId: { [Op.eq]: Productid },
+//             TransactionId: { [Op.eq]: Transactionid },
+//           },
+//         },
+//         { transaction: t }
+//       );
+//     }
+//     return (
+//       await t.commit(),
+//       res.status(200).json({ message: "Transaction detail Deleted" })
+//     );
+//   } catch (error) {
+//     return await t.rollback(), res.status(400).json({ message: error.message });
+//   }
+// };
+
+export const GrandTransactionDetail = async (req, res) => {
   const Transactionid = req.params.transactionid;
-  const { Productid } = req.body;
-  const t = await database.transaction();
+  const { Productid, Qty } = req.body;
   try {
-    if (Array.isArray(Productid)) {
-      Productid.forEach((productarr) => {
-        TransactionDetail.destroy(
+    let transactiondt = [];
+    for (let i = 0; i < Productid.length; i++) {
+      let detailobj = {
+        TransactionId: Transactionid,
+        ProductId: Productid[i],
+        Qty: Qty[i],
+      };
+      transactiondt.push(detailobj);
+    }
+
+  const getresult = await TransactionDetailAction(transactiondt);
+  console.log(getresult);
+    return res.status(201).json({ message: "Transaction detail Created" });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const TransactionDetailAction = async (objDetail) => {
+  database.transaction(async(t) =>{
+    let promiseFind = [];
+    return Promise.all([promiseFind]).then(()=>{
+    objDetail.forEach((TrDetail) => {
+      TransactionDetail.findOne(
           {
             where: {
-              ProductId: { [Op.eq]: productarr },
-              TransactionId: { [Op.eq]: Transactionid },
+              TransactionId: { [Op.eq]: TrDetail.TransactionId },
+              ProductId: { [Op.eq]: TrDetail.ProductId },
             },
+            attributes: ["TransactionId", "ProductId", "Qty"],
+            raw:true
           },
           { transaction: t }
-        );
+        )
+        .then((findProduct) => {
+          
+          if (!findProduct) {
+            //create
+            const CreatePromises = TransactionDetail.create(
+              {
+                TransactionId: TrDetail.TransactionId,
+                ProductId: TrDetail.ProductId,
+                Qty: TrDetail.Qty,
+              },
+              {
+                fields: [
+                  "TransactionId",
+                  "ProductId",
+                  "Qty",
+                  "CreatedAt",
+                  "UpdatedAt",
+                ],
+              },
+              { transaction: t }
+            );
+            promiseFind.push(CreatePromises);
+          } else {
+            if (TrDetail.Qty != 0) {
+              //update
+              const UpdatePromises = TransactionDetail.update(
+                {
+                  Qty: TrDetail.Qty,
+                  UpdatedAt: Date.now(),
+                },
+                {
+                  where: {
+                    TransactionId: { [Op.eq]: TrDetail.TransactionId },
+                    ProductId: { [Op.eq]: TrDetail.ProductId },
+                  },
+                },
+                { transactionid: t }
+              );
+              promiseFind.push(UpdatePromises);
+            } else {
+              //deleted
+              const DestroyPromises = TransactionDetail.destroy(
+                {
+                  where: {
+                    ProductId: { [Op.eq]: TrDetail.ProductId },
+                    TransactionId: { [Op.eq]: TrDetail.TransactionId },
+                  },
+                },
+                { transaction: t }
+              );
+              promiseFind.push(DestroyPromises);
+            }
+          }
+        }).catch((error)=>{
+          throw new Error(error)
+        });
       });
-    } else {
-      TransactionDetail.destroy(
-        {
-          where: {
-            ProductId: { [Op.eq]: Productid },
-            TransactionId: { [Op.eq]: Transactionid },
-          },
-        },
-        { transaction: t }
-      );
-    }
-    return (
-      await t.commit(),
-      res.status(200).json({ message: "Transaction detail Deleted" })
-    );
-  } catch (error) {
-    return await t.rollback(), res.status(400).json({ message: error.message });
-  }
+    });
+    });
 };

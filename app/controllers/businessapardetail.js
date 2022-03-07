@@ -115,7 +115,7 @@ export const CreateApArDetail = async (
     });
     if (!findBusinessApArHd) {
       return (
-        t.rollback(),
+        await t.rollback(),
         res
           .status(404)
           .json({
@@ -135,8 +135,8 @@ export const CreateApArDetail = async (
       },
       { transaction: t }
     );
-    return t.commit();
+    return await t.commit();
   } catch (error) {
-    return t.rollback(), error.message;
+    return await t.rollback(), error.message;
   }
 };

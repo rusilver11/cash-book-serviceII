@@ -37,8 +37,8 @@ import {
 import {
   GetTransactionDetail,
   AddTransactionDetail,
-  EditTransactionDetail,
-  DeleteTransactionDetail,
+  GrandTransactionDetail,
+  EditTransactionDetail
 } from "../controllers/transactiondetail.js";
 import { GetBusinessApAr,AddBusinessApAr,EditBusinessApAr,DeleteBusinessApAr } from "../controllers/businessapar.js";
 import { GetBusinessApArDetail,AddBusinessApArDetail } from "../controllers/businessapardetail.js";
@@ -90,8 +90,8 @@ router.delete("/businesses/:businessid/transactions/:id", VerifyToken, DeleteTra
 //sect TransactionDetail
 router.get("/businesses/:businessid/transactions/:transactionid/detail/:typeid", VerifyToken, GetTransactionDetail);
 router.post("/businesses/transactions/:transactionid/detail", VerifyToken, AddTransactionDetail);
+router.post("/businesses/transactions/:transactionid/grand-detail", VerifyToken, GrandTransactionDetail);
 router.patch("/businesses/transactions/:transactionid/detail", VerifyToken, EditTransactionDetail);
-router.delete("/businesses/transactions/:transactionid/detail", VerifyToken, DeleteTransactionDetail);
 //sect BusinessApAr
 router.get("/businesses/:businessid/businessapar", VerifyToken, GetBusinessApAr);
 router.post("/businesses/:businessid/businessapar", VerifyToken, AddBusinessApAr);

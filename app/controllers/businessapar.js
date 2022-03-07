@@ -162,9 +162,10 @@ export const CreateApAr = async (
       },
       { transaction: t }
     );
-    return t.commit();
+    return await t.commit();
   } catch (error) {
-    return t.rollback(), error.message;
+    await t.rollback();
+    throw new Error(error);
   }
 };
 
@@ -220,9 +221,9 @@ export const DeleteBusinessApAr = async (req, res) => {
     );
 
     return (
-      t.commit(), res.status(200).json({ message: "Business AP or AR Deleted" })
+      await t.commit(), res.status(200).json({ message: "Business AP or AR Deleted" })
     );
   } catch (error) {
-    return t.rollback(), res.status(400).json({ message: error.message });
+    return await t.rollback(), res.status(400).json({ message: error.message });
   }
 };

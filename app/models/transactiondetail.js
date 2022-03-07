@@ -27,9 +27,12 @@ const TransactionDetail = db.define(
     },
     CreatedAt: {
       type: DataTypes.DATE,
+      defaultValue: Date.now()
     },
     UpdatedAt: {
       type: DataTypes.DATE,
+      defaultValue: Date.now(),
+      onUpdate: Date.now()
     },
   },
   { freezeTableName: true }

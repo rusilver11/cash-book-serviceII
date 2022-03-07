@@ -115,7 +115,7 @@ export const EditProductCategory = async (req, res) => {
       },
       { transaction: t }
     );
-    if(CategoryFlagAuto.FlagAuto === 1) return (await t.rollback(), res.status(405).send({message: "AutoCreate category not allowed to deleted"}));
+    if(CategoryFlagAuto.FlagAuto === 1) return (await t.rollback(), res.status(405).send({message: "AutoCreate category not allowed to edit"}));
 
     await ProductCategory.update(
       {

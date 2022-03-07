@@ -47,6 +47,7 @@ export const GetTransactionByDate = async (req, res) => {
         TransactionDate: qrydate,
       },
       order: [["TransactionDate"]],
+      raw: true
     });
 
     const findTransactionBalance = await Transactions.findAll({
@@ -64,6 +65,7 @@ export const GetTransactionByDate = async (req, res) => {
         BusinessId: { [Op.eq]: Businessid },
         TransactionDate: qrydate,
       },
+      raw:true
     });
 
     return res.status(200).json({
@@ -125,14 +127,16 @@ export const AddTransaction = async (req, res) => {
   const t = await database.transaction();
 
   try {
+    //check transaction outcome not allow to input income
     if (flagtransactiontype === 1 && amountin !== null) {
       return (
         t.rollback(),
-        res.status(400).send({
+        res.status(405).send({
           message: "TransactionType Outcome not allowed input Amount Income",
         })
       );
     }
+    //check status payment when debt person need to fill cause they might auto create business ap ar 
     if (status == 0 && personid == null) {
       return (
         t.rollback(),
@@ -162,7 +166,8 @@ export const AddTransaction = async (req, res) => {
           "TransactionDate",
           "FlagTransactionType",
           "FlagStatus",
-          "Amount",
+          "AmountIn",
+          "AmountOut",
           "Description",
           "PaymentType",
           "BusinessId",
@@ -172,7 +177,7 @@ export const AddTransaction = async (req, res) => {
       },
       { transaction: t }
     ).then((createTransaction) => {
-      if (Array.isArray(productid)) {
+      if (Array.isArray(productid)) { //check if detail transaction input more than one product than use bulk create 
         for (let i = 0; i < productid.length; i++) {
           let detailobj = {
             TransactionId: createTransaction.Id,
@@ -195,7 +200,7 @@ export const AddTransaction = async (req, res) => {
         transactiondt.push(detailobj);
       }
     });
-    if (countdetail != 0) {
+    if (countdetail != 0) { //check again transactiondt value is array more than one set count 
       await TransactionDetail.bulkCreate(
         transactiondt,
         {
@@ -220,7 +225,7 @@ export const AddTransaction = async (req, res) => {
           return t.rollback(), res.status(400).send({ message: error.message });
         });
     } else {
-      transactiondt.forEach((e) => {
+      transactiondt.forEach((e) => { //on top transactiondt is array object than want to execute single create
         TransactionDetail.create(
           {
             TransactionId: e.TransactionId,
@@ -254,9 +259,9 @@ export const AddTransaction = async (req, res) => {
           });
       });
     }
-
-    const AutoCreatedApAr = async () => {
-      //check FlagStatus
+    //function to AutocreateApAR 
+    function AutoCreatedApAr () {
+      //auto create Business AP AR when status = 0/transaction is on debt else return nothing
       if (status == 0) {
         BusinessApAr.findOne({
           attributes: ["Id"],
@@ -265,7 +270,7 @@ export const AddTransaction = async (req, res) => {
           let SetApArAmount = flagtransactiontype === "0" ? amountin : amountout;
           let SetFlagApArIn = flagtransactiontype === "0" ? 0 : 1;
           if (!findPersonApAr) {
-            CreateApAr(
+             CreateApAr(
               personid,
               Businessid,
               transactiondate,
@@ -274,7 +279,7 @@ export const AddTransaction = async (req, res) => {
               SetFlagApArIn
             );
           } else {
-            CreateApArDetail(
+             CreateApArDetail(
               findPersonApAr.Id,
               transactiondate,
               SetApArAmount,
@@ -300,10 +305,21 @@ export const EditTransaction = async (req, res) => {
     req.body;
   const t = await database.transaction();
   try {
-    Transactions.hasMany(TransactionDetail, {
-      foreignKey: "TransactionId",
-      as: "TransactionDt",
-    });
+
+    //check transaction outcome not allow to input income
+    const findTransId = await Transactions.findOne({
+      where:{
+        Id:{[Op.eq]:Transactionid}
+      }
+    })
+    if (findTransId.flagtransactiontype === 1 && amountin !== null) {
+      return (
+        t.rollback(),
+        res.status(405).send({
+          message: "TransactionType Outcome not allowed input Amount Income",
+        })
+      );
+    }
 
     await Transactions.update(
       {

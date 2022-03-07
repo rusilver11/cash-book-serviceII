@@ -1,10 +1,11 @@
 import express from "express";
 import route from "./app/routes/index.js";
-import { Client } from "whatsapp-web.js";
+import { Client} from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
 import fs from "fs";
 import { createRequire } from "module"; // Bring in the ability to create the 'require' method
 const require = createRequire(import.meta.url); // construct the require method
+const {LegacySessionAuth} = require("whatsapp-web.js");
 
 const server = express();
 const port = 3000;
@@ -35,7 +36,10 @@ export const client = new Client({
       "--disable-gpu",
     ],
   },
-  session: sessionData,
+  authStrategy: new LegacySessionAuth({
+    session: sessionData
+  })
+  
 });
 
 client.on("qr", async (qr) => {
