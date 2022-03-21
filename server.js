@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url); // construct the require method
 const {LegacySessionAuth} = require("whatsapp-web.js");
 
 const server = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 server.use(helmet());
 server.use(express.urlencoded({ extended: true }));
