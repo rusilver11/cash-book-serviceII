@@ -3,6 +3,8 @@ import {createRequire} from "module"; // Bring in the ability to create the 'req
 const require = createRequire(import.meta.url); // construct the require method
 const configDatabase = require("./configDatabase.json"); // use the require method
 
+
+
 const db = new Sequelize(
     configDatabase.development.database,
     configDatabase.development.username,
@@ -11,15 +13,20 @@ const db = new Sequelize(
     host: configDatabase.development.host,
     dialect: configDatabase.development.dialect,
     define: { timestamps: false },
-    timezone: "Asia/Jakarta"
+    timezone: "Asia/Jakarta",
+    dialectOptions:{
+      ssl:{
+        rejectUnauthorized:false
+      }
+    }
   }
 );
 
 await db.authenticate()
-.then(
+.then(async()=>{
   console.log("Database Connected")
-).catch(error=>{
-  console.log(error);
+}).catch(error=>{
+  throw new Error(error);
 })
 
 export default db
