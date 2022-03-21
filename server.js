@@ -23,6 +23,7 @@ let sessionData;
 if (fs.existsSync(SESSION_FILE_PATH)) {
   sessionData = require(SESSION_FILE_PATH);
 }
+
 //use the saved values
 export const client = new Client({
   restartOnAuthFail: true,
@@ -61,6 +62,7 @@ client.on("authenticated", async (session) => {
 
 client.on("ready", async () => {
   console.log("Client is ready!");
+  //server listen
   server.listen(port, () => console.log("Server is now running at port", port));
 });
 

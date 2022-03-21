@@ -7,7 +7,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "pm2 start server.js --watch",
+    "dev": "nodemon server.js",
     "test": "mocha test/**/**/*.js --exit --grep"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "morgan": "^1.10.0",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
+    "pm2": "^5.2.0",
     "qrcode-terminal": "^0.12.0",
     "sequelize": "^6.9.0",
     "sequelize-cli": "^6.3.0",

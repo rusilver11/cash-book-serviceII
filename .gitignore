@@ -1,6 +1,5 @@
 node_modules
 test
-wasession.json
 node_modules/*
 # Logs
 logs
