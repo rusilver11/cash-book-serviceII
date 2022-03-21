@@ -2,6 +2,7 @@ import express from "express";
 import route from "./app/routes/index.js";
 import { Client} from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
+import helmet from "helmet";
 import fs from "fs";
 import { createRequire } from "module"; // Bring in the ability to create the 'require' method
 const require = createRequire(import.meta.url); // construct the require method
@@ -10,6 +11,7 @@ const {LegacySessionAuth} = require("whatsapp-web.js");
 const server = express();
 const port = 3000;
 
+server.use(helmet());
 server.use(express.urlencoded({ extended: true }));
 server.use(express.json());
 server.use(route);

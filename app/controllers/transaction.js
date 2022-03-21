@@ -58,7 +58,7 @@ export const GetTransactionByDate = async (req, res) => {
         ],
         [
           database.Sequelize.fn("SUM", database.Sequelize.col("AmountOut")),
-          "Outcome",
+          "Expense",
         ],
       ],
       where: {
@@ -127,12 +127,12 @@ export const AddTransaction = async (req, res) => {
   const t = await database.transaction();
 
   try {
-    //check transaction outcome not allow to input income
+    //check transaction expense not allow to input income
     if (flagtransactiontype === 1 && amountin !== null) {
       return (
         t.rollback(),
         res.status(405).send({
-          message: "TransactionType Outcome not allowed input Amount Income",
+          message: "TransactionType Expense not allowed input Amount Income",
         })
       );
     }
@@ -306,7 +306,7 @@ export const EditTransaction = async (req, res) => {
   const t = await database.transaction();
   try {
 
-    //check transaction outcome not allow to input income
+    //check transaction epense not allow to input income
     const findTransId = await Transactions.findOne({
       where:{
         Id:{[Op.eq]:Transactionid}
@@ -316,7 +316,7 @@ export const EditTransaction = async (req, res) => {
       return (
         t.rollback(),
         res.status(405).send({
-          message: "TransactionType Outcome not allowed input Amount Income",
+          message: "TransactionType Expense not allowed input Amount Income",
         })
       );
     }
