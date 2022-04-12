@@ -18,7 +18,11 @@ const BusinessApArDetail = db.define("BusinessApArDetail",{
     defaultValue:DataTypes.NOW,
     allowNull: false
   },
-  Amount:{ 
+  ApAmount:{ 
+    type:DataTypes.DECIMAL,
+    defaultValue:0
+  },
+  ArAmount:{ 
     type:DataTypes.DECIMAL,
     defaultValue:0
   },

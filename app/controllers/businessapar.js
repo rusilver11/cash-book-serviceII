@@ -1,17 +1,14 @@
-import Sequelize from "sequelize";
+import Sequelize, { where } from "sequelize";
 import database from "../config/connectionDatabase.js";
 import BusinessApAr from "../models/businessapar.js";
 import BusinessApArDetail from "../models/businessapardetail.js";
+import { CreateApArDetail } from "./businessapardetail.js";
 const Op = Sequelize.Op;
 
 //associate
 BusinessApAr.hasMany(BusinessApArDetail, {
   foreignKey: "BusinessApArId",
-  as: "ApArIn",
-});
-BusinessApAr.hasMany(BusinessApArDetail, {
-  foreignKey: "BusinessApArId",
-  as: "ApArOut",
+  as: "ApArDetailBusinessApAr",
 });
 
 export const GetBusinessApAr = async (req, res) => {
@@ -24,20 +21,21 @@ export const GetBusinessApAr = async (req, res) => {
         "DueDate",
         [
           database.Sequelize.literal(
-            `COALESCE(CAST((sum("ApArIn"."Amount") - sum("ApArOut"."Amount"))as money),'0')`
+            `(COALESCE(SUM("ApArDetailBusinessApAr"."ApAmount"),'0') - COALESCE(SUM("ApArDetailBusinessApAr"."ArAmount"),'0') )`
           ),
           "TotalAmount",
         ],
       ],
       include: [
         {
-          association: "ApArIn",
+          association: "ApArDetailBusinessApAr",
           attributes: {
             exclude: [
               "Id",
               "BusinessApArId",
               "ApArDate",
-              "Amount",
+              "ApAmount",
+              "ArAmount",
               "Description",
               "FlagApArIn",
               "CreatedAt",
@@ -45,25 +43,8 @@ export const GetBusinessApAr = async (req, res) => {
             ],
           },
           required: false,
-          where: { FlagApArIn: { [Op.eq]: 1 } },
         },
-        {
-          association: "ApArOut",
-          attributes: {
-            exclude: [
-              "Id",
-              "BusinessApArId",
-              "ApArDate",
-              "Amount",
-              "Description",
-              "FlagApArIn",
-              "CreatedAt",
-              "UpdatedAt",
-            ],
-          },
-          required: false,
-          where: { FlagApArIn: { [Op.eq]: 0 } },
-        },
+
         { association: "BusinessApArPerson", attributes: ["ContactId"] },
       ],
       where: {
@@ -72,8 +53,7 @@ export const GetBusinessApAr = async (req, res) => {
       group: [
         "BusinessApAr.Id",
         "BusinessApAr.PersonId",
-        "BusinessApArPerson.ContactId",
-        "BusinessApArPerson.Id",
+        "BusinessApArPerson.ContactId"
       ],
       raw: true,
     });
@@ -85,25 +65,54 @@ export const GetBusinessApAr = async (req, res) => {
 };
 
 export const AddBusinessApAr = async (req, res) => {
-  const BusinessId = req.params.businessid
+  const BusinessId = req.params.businessid;
   const {
     //header
     personid,
     //detail
     apardate,
-    amount,
+    apamount,
+    aramount,
     description,
     flagaparin,
   } = req.body;
   try {
-    await CreateApAr(
-      personid,
-      BusinessId,
-      apardate,
-      amount,
-      description,
-      flagaparin
-    );
+    if(apamount && aramount){
+      return res.status(405).json({message:"Please choose one AP or AR"})
+    }else if(flagaparin == 1 && aramount) {
+      return res.status(405).json({message:"Flag type In not allow input AR Amount"})
+    }else if(flagaparin == 0 && apamount){
+      return res.status(405).json({message:"Flag type Out not allow input AP Amount"})
+    }else{
+    const findApAr = await BusinessApAr.findOne({
+      attributes: ["Id"],
+      where: {
+        BusinessId: BusinessId,
+        PersonId: personid,
+      },
+      raw: true,
+    });
+    if (findApAr) {
+      CreateApArDetail(
+        findApAr.Id,
+        apardate,
+        apamount,
+        aramount,
+        description,
+        flagaparin
+      );
+    } else {
+      await CreateApAr(
+        personid,
+        BusinessId,
+        apardate,
+        apamount,
+        aramount,
+        description,
+        flagaparin
+      );
+    }
+  }
     return res.status(201).json({ message: "Business AP or AR created" });
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -116,7 +125,8 @@ export const CreateApAr = async (
   businessid,
   //detail
   apardate,
-  amount,
+  apamount,
+  aramount,
   description,
   flagaparin
 ) => {
@@ -130,42 +140,23 @@ export const CreateApAr = async (
         UpdatedAt: Date.now(),
       },
       {
-        fields: [
-          "PersonId",
-          "BusinessId",
-          "CreatedAt",
-          "UpdatedAt",
-        ],
+        fields: ["PersonId", "BusinessId", "CreatedAt", "UpdatedAt"],
       },
       { transaction: t }
     );
-    await BusinessApArDetail.create(
-      {
-        BusinessApArId: CreateApAr.Id,
-        ApArDate: apardate,
-        Amount: amount,
-        Description: description,
-        FlagApArIn: flagaparin,
-        CreatedAt: Date.now(),
-        UpdatedAt: Date.now(),
-      },
-      {
-        fields: [
-          "BusinessApArId",
-          "ApArDate",
-          "Amount",
-          "Description",
-          "FlagApArIn",
-          "CreatedAt",
-          "UpdatedAt",
-        ],
-      },
-      { transaction: t }
+    await CreateApArDetail(
+      CreateApAr.Id,
+      apardate,
+      apamount,
+      aramount,
+      description,
+      flagaparin
     );
+    
     return await t.commit();
   } catch (error) {
     await t.rollback();
-    throw new Error(error);
+    throw new Error(error.message);
   }
 };
 
@@ -221,7 +212,8 @@ export const DeleteBusinessApAr = async (req, res) => {
     );
 
     return (
-      await t.commit(), res.status(200).json({ message: "Business AP or AR Deleted" })
+      await t.commit(),
+      res.status(200).json({ message: "Business AP or AR Deleted" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });

@@ -27,7 +27,6 @@ export const GetBusinessApArDetail = async (req, res) => {
       attributes: [
         "PersonId",
         "DueDate",
-        //[database.Sequelize.literal(`COALESCE(CAST((sum("ApArDetailIn"."Amount") - sum("ApArDetailOut"."Amount"))as money),'0')`),"TotalAmount"]
         [
           database.Sequelize.literal(`
         COALESCE(CAST(SUM((case
@@ -84,16 +83,25 @@ export const GetBusinessApArDetail = async (req, res) => {
 
 export const AddBusinessApArDetail = async (req, res) => {
   const businessaparid = req.params.businessaparid;
-  const { apardate, amount, description, flagaparin } = req.body;
+  const { apardate, apamount, aramount,description, flagaparin } = req.body;
   try {
+    if(apamount && aramount){
+      return res.status(405).json({message:"Please choose one AP or AR"})
+    }else if(flagaparin == "1" && aramount) {
+      return res.status(405).json({message:"Flag type In not allow input AR Amount"})
+    }else if(flagaparin == "0" && apamount){
+      return res.status(405).json({message:"Flag type Out not allow input AP Amount"})
+    }else{
     await CreateApArDetail(
       businessaparid,
       apardate,
-      amount,
+      apamount,
+      aramount,
       description,
       flagaparin
     );
     return res.status(201).json({ message: "Ap or Ar Detail Created" });
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -102,7 +110,8 @@ export const AddBusinessApArDetail = async (req, res) => {
 export const CreateApArDetail = async (
   businessaparid,
   apardate,
-  amount,
+  apamount,
+  aramount,
   description,
   flagaparin
 ) => {
@@ -114,29 +123,28 @@ export const CreateApArDetail = async (
       },
     });
     if (!findBusinessApArHd) {
-      return (
-        await t.rollback(),
-        res
-          .status(404)
-          .json({
-            message: "AP or AR Header doesn't exist, please create header first!",
-          })
+      await t.rollback();
+      throw new Error(
+        "AP or AR Header doesn't exist, please create header first!"
       );
+    } else {
+      await BusinessApArDetail.create(
+        {
+          BusinessApArId: businessaparid,
+          ApArDate: apardate,
+          ApAmount: apamount,
+          ArAmount: aramount,
+          Description: description,
+          FlagApArIn: flagaparin,
+          CreatedAt: Date.now(),
+          UpdatedAt: Date.now(),
+        },
+        { transaction: t }
+      );
+      return await t.commit();
     }
-    await BusinessApArDetail.create(
-      {
-        BusinessApArId: businessaparid,
-        ApArDate: apardate,
-        Amount: amount,
-        Description: description,
-        FlagApArIn: flagaparin,
-        CreatedAt: Date.now(),
-        UpdatedAt: Date.now(),
-      },
-      { transaction: t }
-    );
-    return await t.commit();
   } catch (error) {
-    return await t.rollback(), error.message;
+    await t.rollback();
+    throw new Error(error.message);
   }
 };

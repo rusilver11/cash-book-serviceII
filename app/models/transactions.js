@@ -58,6 +58,9 @@ const Transactions = db.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    TransactionCategoryId: {
+      type:DataTypes.STRING,
+    },
     CreatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,

@@ -1,7 +1,6 @@
 import Transactions from "../models/transactions.js";
 import TransactionDetail from "../models/transactiondetail.js";
 import BusinessApAr from "../models/businessapar.js";
-import BusinessApArDetail from "../models/businessapardetail.js";
 import { CreateApAr } from "./businessapar.js";
 import { CreateApArDetail } from "./businessapardetail.js";
 import Sequelize from "sequelize";
@@ -47,7 +46,7 @@ export const GetTransactionByDate = async (req, res) => {
         TransactionDate: qrydate,
       },
       order: [["TransactionDate"]],
-      raw: true
+      raw: true,
     });
 
     const findTransactionBalance = await Transactions.findAll({
@@ -65,7 +64,7 @@ export const GetTransactionByDate = async (req, res) => {
         BusinessId: { [Op.eq]: Businessid },
         TransactionDate: qrydate,
       },
-      raw:true
+      raw: true,
     });
 
     return res.status(200).json({
@@ -82,12 +81,13 @@ export const GetTransaction = async (req, res) => {
     const Transactionid = req.params.id;
     const Businessid = req.params.businessid;
 
-    const findTransactionByMonth = await Transactions.findAll({
+    const findTransaction = await Transactions.findAll({
       attributes: [
         "Id",
         "TransactionDate",
         "FlagTransactionType",
         "FlagStatus",
+        "TransactionCategoryId",
         "AmountIn",
         "AmountOut",
         "Description",
@@ -103,7 +103,7 @@ export const GetTransaction = async (req, res) => {
       },
     });
 
-    return res.status(200).json({ result: findTransactionByMonth });
+    return res.status(200).json({ result: findTransaction });
   } catch (error) {
     return res.status(400).send({ message: error.message });
   }
@@ -128,19 +128,17 @@ export const AddTransaction = async (req, res) => {
 
   try {
     //check transaction expense not allow to input income
-    if (flagtransactiontype === 1 && amountin !== null) {
+    if (flagtransactiontype === "1" && amountin) {
       return (
         t.rollback(),
-        res.status(405).send({
-          message: "TransactionType Expense not allowed input Amount Income",
-        })
+        res.status(405).send({message: "TransactionType Expense not allowed input Amount Income"})
       );
     }
-    //check status payment when debt person need to fill cause they might auto create business ap ar 
+    //check status payment when debt person need to fill cause they might auto create business ap ar
     if (status == 0 && personid == null) {
       return (
         t.rollback(),
-        res.status(400).send({ message: "Person must filled, in Debt status" })
+        res.status(405).send({ message: "Person must filled, in Debt status" })
       );
     }
 
@@ -177,7 +175,8 @@ export const AddTransaction = async (req, res) => {
       },
       { transaction: t }
     ).then((createTransaction) => {
-      if (Array.isArray(productid)) { //check if detail transaction input more than one product than use bulk create 
+      if (Array.isArray(productid)) {
+        //check if detail transaction input more than one product than use bulk create
         for (let i = 0; i < productid.length; i++) {
           let detailobj = {
             TransactionId: createTransaction.Id,
@@ -200,7 +199,8 @@ export const AddTransaction = async (req, res) => {
         transactiondt.push(detailobj);
       }
     });
-    if (countdetail != 0) { //check again transactiondt value is array more than one set count 
+    if (countdetail != 0) {
+      //check again transactiondt value is array more than one set count
       await TransactionDetail.bulkCreate(
         transactiondt,
         {
@@ -215,17 +215,21 @@ export const AddTransaction = async (req, res) => {
         { transaction: t }
       )
         .then(() => {
-          return (
-            AutoCreatedApAr(),
-            t.commit(),
-            res.status(201).json({ message: "created successfully" })
-          );
+          return AutoCreatedApAr()
+            .then(() => {
+              t.commit(),
+                res.status(201).json({ message: "created successfully" });
+            })
+            .catch((error) => {
+              throw new Error(error.message);
+            });
         })
         .catch((error) => {
           return t.rollback(), res.status(400).send({ message: error.message });
         });
     } else {
-      transactiondt.forEach((e) => { //on top transactiondt is array object than want to execute single create
+      transactiondt.forEach((e) => {
+        //on top transactiondt is array object than want to execute single create
         TransactionDetail.create(
           {
             TransactionId: e.TransactionId,
@@ -246,11 +250,14 @@ export const AddTransaction = async (req, res) => {
           { transaction: t }
         )
           .then(() => {
-            return (
-              AutoCreatedApAr(),
-              t.commit(),
-              res.status(201).json({ message: "created successfully" })
-            );
+            return AutoCreatedApAr()
+              .then(() => {
+                t.commit(),
+                  res.status(201).json({ message: "created successfully" });
+              })
+              .catch((error) => {
+                throw new Error(error.message);
+              });
           })
           .catch((error) => {
             return (
@@ -259,40 +266,45 @@ export const AddTransaction = async (req, res) => {
           });
       });
     }
-    //function to AutocreateApAR 
-    function AutoCreatedApAr () {
+    //function to AutocreateApAR
+    async function AutoCreatedApAr() {
       //auto create Business AP AR when status = 0/transaction is on debt else return nothing
-      if (status == 0) {
-        BusinessApAr.findOne({
-          attributes: ["Id"],
-          where: { PersonId: { [Op.eq]: personid } },
-        }).then((findPersonApAr) => {
-          let SetApArAmount = flagtransactiontype === "0" ? amountin : amountout;
+      try {
+        if (status == 0) {
+          let findPersonApAr = await BusinessApAr.findOne({
+            attributes: ["Id"],
+            where: { PersonId: { [Op.eq]: personid } },
+          });
+
+          let newAmountout = flagtransactiontype === "0" ? 0 : amountout;
           let SetFlagApArIn = flagtransactiontype === "0" ? 0 : 1;
           if (!findPersonApAr) {
-             CreateApAr(
+            CreateApAr(
               personid,
               Businessid,
               transactiondate,
-              SetApArAmount,
+              newAmountout, //AP
+              amountin, //AR
               description,
               SetFlagApArIn
             );
           } else {
-             CreateApArDetail(
+            CreateApArDetail(
               findPersonApAr.Id,
               transactiondate,
-              SetApArAmount,
+              newAmountout, //AP
+              amountin, //AR
               description,
               SetFlagApArIn
             );
           }
-        });
-      } else {
-        return;
+        } else {
+          return;
+        }
+      } catch (error) {
+        throw new Error("Auto created AP or AR failed");
       }
-    };
-
+    }
   } catch (error) {
     return await t.rollback(), res.status(400).send({ message: error.message });
   }
@@ -305,13 +317,12 @@ export const EditTransaction = async (req, res) => {
     req.body;
   const t = await database.transaction();
   try {
-
     //check transaction epense not allow to input income
     const findTransId = await Transactions.findOne({
-      where:{
-        Id:{[Op.eq]:Transactionid}
-      }
-    })
+      where: {
+        Id: { [Op.eq]: Transactionid },
+      },
+    });
     if (findTransId.flagtransactiontype === 1 && amountin !== null) {
       return (
         t.rollback(),
@@ -338,7 +349,8 @@ export const EditTransaction = async (req, res) => {
       { transaction: t }
     );
     return (
-      await t.commit(), res.status(204).json({ message: "Updated successfully" })
+      await t.commit(),
+      res.status(204).json({ message: "Updated successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });
@@ -369,7 +381,8 @@ export const DeleteTransaction = async (req, res) => {
     );
     //pr: AP AR update set to lunas
     return (
-      await t.commit(), res.status(204).json({ message: "deleted successfully" })
+      await t.commit(),
+      res.status(204).json({ message: "deleted successfully" })
     );
   } catch (error) {
     return await t.rollback(), res.status(400).json({ message: error.message });
