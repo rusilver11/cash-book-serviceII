@@ -42,6 +42,7 @@ import {
 } from "../controllers/transactiondetail.js";
 import { GetBusinessApAr,AddBusinessApAr,EditBusinessApAr,DeleteBusinessApAr } from "../controllers/businessapar.js";
 import { GetBusinessApArDetail,AddBusinessApArDetail } from "../controllers/businessapardetail.js";
+import { GetHomeByDate,GetHome } from "../controllers/home.js";
 const router = express.Router();
 
 //home
@@ -57,26 +58,29 @@ router.post("/auth/login/otp", VerifyOTP);
 router.post("/auth/login/resend-otp", ResendOTP);
 router.post("/auth/token", RefreshToken);
 router.delete("/auth/logout/:userid", Logout);
+//sect home
+router.get("/users/businesses/:businessid/home/:startdate/:enddate", VerifyToken, GetHomeByDate);
+router.get("/users/businesses/:businessid/home", VerifyToken, GetHome);
 //sect business category
 router.get("/users/businesses/business-categories", VerifyToken, GetAllBusinesscategory);
 //sect businesses
 router.get("/users/businesses/:id", VerifyToken, GetBusinesses);
 router.get("/users/:userid/businesses", VerifyToken, GetAllBusinesses);
 router.post("/users/:userid/businesses", VerifyToken, AddBusinesses);
-router.patch("/users/businesses/:id", VerifyToken, EditBusinesses);
+router.put("/users/businesses/:id", VerifyToken, EditBusinesses);
 router.delete("/users/businesses/:id", VerifyToken, DeleteBusinesses);
 //sect product category
 router.get("/businesses/:businessid/product-categories", VerifyToken, GetAllProductcategory);
 router.get("/businesses/:businessid/product-categories/:id", VerifyToken, GetProductcategory);
 router.get("/businesses/:businessid/product-categories/products/:typeid", VerifyToken, GetAllProductsGroupByCategory);
 router.post("/businesses/:businessid/product-categories", VerifyToken, AddProductCategory);
-router.patch("/businesses/:businessid/product-categories/:id", VerifyToken, EditProductCategory);
+router.put("/businesses/:businessid/product-categories/:id", VerifyToken, EditProductCategory);
 router.delete("/businesses/:businessid/product-categories/:id", VerifyToken, DeleteProductCategory);
 //sect product
 router.get("/businesses/:businessid/products/:typeid", VerifyToken, GetAllProducts);
 router.get("/businesses/:businessid/products/:typeid/:id", VerifyToken, GetProduct);
 router.post("/businesses/:businessid/products", VerifyToken, AddProduct);
-router.patch("/businesses/:businessid/products/:id", VerifyToken, EditProduct);
+router.put("/businesses/:businessid/products/:id", VerifyToken, EditProduct);
 router.delete("/businesses/:businessid/products/:id", VerifyToken, DeleteProduct);
 //sect persons
 router.get("/users/:userid/persons", VerifyToken, GetAllContact);
@@ -85,7 +89,7 @@ router.post("/users/:userid/persons", VerifyToken, AddContact);
 router.get("/businesses/:businessid/transactions/:startdate/:enddate", VerifyToken, GetTransactionByDate);
 router.get("/businesses/:businessid/transactions/:id", VerifyToken, GetTransaction);
 router.post("/businesses/:businessid/transactions", VerifyToken, AddTransaction);
-router.patch("/businesses/:businessid/transactions/:id", VerifyToken, EditTransaction);
+router.put("/businesses/:businessid/transactions/:id", VerifyToken, EditTransaction);
 router.delete("/businesses/:businessid/transactions/:id", VerifyToken, DeleteTransaction);
 //sect TransactionDetail
 router.get("/businesses/:businessid/transactions/:transactionid/detail/:typeid", VerifyToken, GetTransactionDetail);
@@ -95,7 +99,7 @@ router.patch("/businesses/transactions/:transactionid/detail", VerifyToken, Edit
 //sect BusinessApAr
 router.get("/businesses/:businessid/businessapar", VerifyToken, GetBusinessApAr);
 router.post("/businesses/:businessid/businessapar", VerifyToken, AddBusinessApAr);
-router.patch("/businesses/:businessid/businessapar/:id", VerifyToken, EditBusinessApAr);
+router.put("/businesses/:businessid/businessapar/:id", VerifyToken, EditBusinessApAr);
 router.delete("/businesses/:businessid/businessapar/:id", VerifyToken, DeleteBusinessApAr);
 //sect BusinessApArDetail
 router.get("/businesses/:businessid/businessapar/:businessaparid/detail", VerifyToken, GetBusinessApArDetail);

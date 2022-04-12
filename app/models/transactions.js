@@ -58,6 +58,9 @@ const Transactions = db.define(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    TransactionCategoryId: {
+      type:DataTypes.STRING,
+    },
     CreatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -79,11 +82,4 @@ Transactions.belongsTo(Businesses, {
   as: "TransactionBusiness",
 });
 
-// Transactions.associate = function(models) {
-//   // define association here
-//   Transactions.hasMany(models.TransactionDetail,{
-//     foreignKey: 'TransactiId',
-//     as: 'TransactionTransactionDetail'
-//   });
-// };
 export default Transactions;
