@@ -6,12 +6,12 @@ const configDatabase = require("./configDatabase.json"); // use the require meth
 
 
 const db = new Sequelize(
-    configDatabase.development.database,
-    configDatabase.development.username,
-    configDatabase.development.password,
+    configDatabase.production.database,
+    configDatabase.production.username,
+    configDatabase.production.password,
   {
-    host: configDatabase.development.host,
-    dialect: configDatabase.development.dialect,
+    host: configDatabase.production.host,
+    dialect: configDatabase.production.dialect,
     define: { timestamps: false },
     timezone: "Asia/Jakarta",
     dialectOptions:{

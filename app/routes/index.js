@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import { VerifyToken } from "../middlewares/jwt-auth.js";
 import { RefreshToken } from "../controllers/auth.js";
 import { getUsers, Login, VerifyOTP, Logout } from "../controllers/user.js";
@@ -43,12 +44,18 @@ import {
 import { GetBusinessApAr,AddBusinessApAr,EditBusinessApAr,DeleteBusinessApAr } from "../controllers/businessapar.js";
 import { GetBusinessApArDetail,AddBusinessApArDetail } from "../controllers/businessapardetail.js";
 import { GetHomeByDate,GetHome } from "../controllers/home.js";
+
 const router = express.Router();
 
 //home
 router.get("/version", (req, res) =>
   res.status(200).send({ message: "Service Ready" })
 );
+router.get("/wascanqrcode", (req, res)=>{
+  res.sendFile("scanqr.html",{
+    root:"./app/utils/"
+  });
+});
 
 //User Router
 router.get("/users", VerifyToken, getUsers);
