@@ -82,11 +82,4 @@ Transactions.belongsTo(Businesses, {
   as: "TransactionBusiness",
 });
 
-// Transactions.associate = function(models) {
-//   // define association here
-//   Transactions.hasMany(models.TransactionDetail,{
-//     foreignKey: 'TransactiId',
-//     as: 'TransactionTransactionDetail'
-//   });
-// };
 export default Transactions;

@@ -1,7 +1,8 @@
 node_modules
 test
-wasession.json
 node_modules/*
+.wwebjs_auth/
+.wwebjs_auth/*
 # Logs
 logs
 *.log

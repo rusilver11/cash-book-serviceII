@@ -175,8 +175,9 @@ export const VerifyOTP = async (req, res) => {
       maxAge: 86400000, //24h
     });
     return await t.commit(), res.status(200).json({ message: "Verification success" ,
+    userId: UserId,
     token: accessToken,
-  refreshToken: refreshToken });
+    refreshToken: refreshToken });
   } catch (error) {
     return await t.rollback(), res.status(400).send({ response: error.message });
   }
